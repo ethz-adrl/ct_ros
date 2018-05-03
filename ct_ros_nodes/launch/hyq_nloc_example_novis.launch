@@ -1,0 +1,30 @@
+<!-- 
+Note: in order to hand over arguments to roslaunch type for example the following:
+roslaunch ct_ros_nodes hyq_nloc_example.launch task:=turn
+-->
+
+<launch>
+	<arg name="task" default="stand" />
+	
+	<!--node pkg="robot_state_publisher" type="robot_state_publisher" name="hyq_state_publisher" >
+      <remap from="robot_description" to="hyq_description" />
+    </node-->
+    
+    <!--node name="rqt_reconfigure" pkg="rqt_reconfigure" type="rqt_reconfigure" /-->
+    
+    <node name="hyq_nloc" pkg="ct_ros_nodes" type="HyQNLOCContactModel" respawn="false" output="screen" >
+        <param name="useCodegenModel" value="true" />
+        <param name="skip" value="1" />
+    	<param name="alpha" value="100.0" />
+    	<param name="alpha_n" value="100.0" />
+    	<param name="k" value="5000.0" />
+    	<param name="d" value="1000.0" />
+    	<param name="zOffset" value="-0.02" />
+    	<param name="smoothing" value="1" />
+    	<param name="x_init" value="0" />
+    	<param name="y_init" value="0" />
+    	<param name="z_init" value="0.572" /> 
+       	<param name="workingDirectory" value="$(find ct_ros_nodes)/config/HyQ/nloc/$(arg task)" />
+    </node>
+	
+</launch>

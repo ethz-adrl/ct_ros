@@ -1,0 +1,36 @@
+timeHorizon 1.0
+
+alg
+{
+	integrator RK4CT								
+	useSensitivityIntegrator true
+	discretization Forward_euler
+	timeVaryingDiscretization false
+    dt 0.005
+	K_sim 10
+	K_shot 1
+    epsilon 1e-6
+	max_iterations 150
+    fixedHessianCorrection false
+    recordSmallestEigenvalue false
+    min_cost_improvement 1e-7
+    meritFunctionRho 1000
+    closedLoopShooting true
+    nThreads 1
+    nThreadsEigen 1
+    locp_solver GNRICCATI_SOLVER
+    nlocp_algorithm ILQR
+    loggingPrefix ""
+    printSummary true
+    debugPrint false
+    
+    line_search
+	{
+		active true ;
+		adaptive false ;
+		maxIterations 10 ;
+		alpha_0 1.0 ;
+		n_alpha 0.5;
+		debugPrint false
+	}
+}

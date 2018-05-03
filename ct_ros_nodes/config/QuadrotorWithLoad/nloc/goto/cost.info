@@ -1,0 +1,198 @@
+term0
+{
+	name "intermediate cost"
+	kind "quadratic"   
+	type 0              ; 0 = intermediate, 1 = final
+
+	weights
+	{
+		; state weighting
+		Q
+		{
+			scaling 1
+
+			; orientation
+			(0,0) 0.0     ; x
+			(1,1) 0.0     ; y 
+			(2,2) 0.0     ; z
+
+			; position
+			(3,3) 0.0     ; x
+			(4,4) 0.0     ; y
+			(5,5) 0.0     ; z
+			
+			; joint state              
+			(6,6)   0.0     ;joint
+			(7,7)   0.0     ;joint2
+			
+			; angular velocity
+			(8,8)   1.0    ; x
+			(9,9)   1.0    ; y
+			(10,10) 1.0    ; z
+
+			; translational velocity
+			(11,11) 1.0    ; x
+			(12,12) 1.0    ; y
+			(13,13) 1.0    ; z
+
+			; joint velocity
+			(14,14) 1.0    ; joint1
+			(15,15) 1.0    ; joint2
+		}
+		R
+		{
+			scaling 1
+			(0,0) 1.0   
+			(1,1) 1.0   
+			(2,2) 1.0   
+			(3,3) 0.01     ; put less penalty on the thrust then on the angular moments
+		}
+
+
+		x_des
+		{
+			; orientation
+			(0,0) 0.0     ; x
+			(1,0) 0.0     ; y 
+			(2,0) 0.0     ; z
+			; position
+			(3,0) 0.0     ; x
+			(4,0) 0.0     ; y
+			(5,0  0.0     ; z
+			; joint state              
+			(6,0) 0.0
+			(7,0) 0.0
+			; angular velocity
+			(8,0)  0.0    ; x
+			(9,0)  0.0    ; y
+			(10,0) 0.0    ; z
+			; translational velocity
+			(11,0) 0.0    ; x
+			(12,0) 0.0    ; y
+			(13,0) 0.0    ; z
+			; joint velocity
+			(14,0) 0.0
+			(15,0) 0.0
+		}
+		
+		u_des
+		{
+			(0,0) 0.0
+			(1,0) 0.0
+			(2,0) 0.0
+			(3,0) 6.13125
+		}
+	}
+}
+
+
+term1
+{
+	name "final cost"
+	kind "quadratic"   
+	type 1              ; 0 = intermediate, 1 = final
+
+	weights
+	{
+		; state weighting
+		Q
+		{
+			scaling 100
+
+			; orientation
+			(0,0) 1.0     ; x
+			(1,1) 1.0     ; y 
+			(2,2) 1.0     ; z
+
+			; position
+			(3,3) 1.0     ; x
+			(4,4) 1.0     ; y
+			(5,5) 1.0     ; z
+			
+			; joint state              
+			(6,6)   3.0     ;joint
+			(7,7)   10.0     ;joint2
+			
+			; angular velocity
+			(8,8)   0.1  ; x
+			(9,9)   0.1  ; y
+			(10,10) 0.1  ; z
+
+			; translational velocity
+			(11,11) 0.1    ; x
+			(12,12) 0.1    ; y
+			(13,13) 0.1    ; z
+
+			; joint velocity
+			(14,14) 0.1    ; joint1
+			(15,15) 0.1    ; joint2
+		}
+
+		x_des
+		{
+			; orientation
+			(0,0) 0.0     ; x
+			(1,0) 0.0     ; y 
+			(2,0) 0.0     ; z
+			; position
+			(3,0) 1.0     ; x
+			(4,0) 0.0     ; y
+			(5,0 0.0     ; z
+			; joint state              
+			(6,0)   0.0     ;joint
+			(7,0)   0.0     ;joint2
+			; angular velocity
+			(8,0) 0.0    ; x
+			(9,0) 0.0    ; y
+			(10,0) 0.0    ; z
+			; translational velocity
+			(11,0) 0.0    ; x
+			(12,0) 0.0    ; y
+			(13,0) 0.0    ; z
+			; joint velocity
+			(14,0) 0.0    ; joint1
+			(15,0) 0.0    ; joint2
+		}
+	}
+}
+
+
+
+; initial position
+x_0
+{
+			; orientation
+			(0,0) 0.0     ; x
+			(1,0) 0.0     ; y 
+			(2,0) 0.0     ; z
+			; position
+			(3,0) 0.0     ; x
+			(4,0) 0.0     ; y
+			(5,0) 0.0     ; z
+			; joint state              
+			(6,0) 0.0     ;joint
+			(7,0) 0.5     ;joint2
+			; angular velocity
+			(8,0) 0.0    ; x
+			(9,0) 0.0    ; y
+			(10,0) 0.0    ; z
+			; translational velocity
+			(11,0) 0.0    ; x
+			(12,0) 0.0    ; y
+			(13,0) 0.0    ; z
+			; joint velocity
+			(14,0) 0.0    ; joint1
+			(15,0) 0.0    ; joint2
+}
+
+
+K_init
+{
+	scaling 0.0
+    ; nothing entered -- feedback controller hard to tune manually.
+}
+
+
+
+
+

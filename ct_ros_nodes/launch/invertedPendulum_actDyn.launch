@@ -1,0 +1,20 @@
+<launch>
+	<arg name="task" default="actuatordyn_goto" />
+	
+	<node name="rviz" pkg="rviz" type="rviz" respawn="false" output="screen" args="-d $(find ct_ros_nodes)/rviz/invertedPendulumViz.rviz"/>		
+	
+	<param name="inverted_pendulum_description" textfile="$(find ct_models)/urdf/InvertedPendulum/InvertedPendulum.urdf" />
+	
+	<node pkg="robot_state_publisher" type="robot_state_publisher" name="inverted_pendulum_state_publisher">
+ 	  <param name="~tf_prefix" value="ip" type="str"/>
+      <remap from="robot_description" to="inverted_pendulum_description" />
+      <remap from="joint_states" to="current_joint_states" />
+    </node>
+    
+    <!--node name="rqt_reconfigure" pkg="rqt_reconfigure" type="rqt_reconfigure" /-->
+    
+    <node name="invertedpendulum_nloc" pkg="ct_ros_nodes" type="InvertedPendulumNLOC_actDyn" respawn="false" output="screen" >
+       	<param name="workingDirectory" value="$(find ct_ros_nodes)/config/InvertedPendulum/nloc/$(arg task)" />
+    </node>
+	
+</launch>

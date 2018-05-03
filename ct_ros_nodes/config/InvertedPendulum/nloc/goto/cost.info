@@ -1,0 +1,92 @@
+term0
+{
+	name "intermediate cost"
+	kind "quadratic"   
+	type 0              ; 0 = intermediate, 1 = final
+
+	weights
+	{
+		; state weighting
+		Q
+		{
+			scaling 1.0
+
+			; joint position              
+			(0,0)   0.0
+			
+			; joint velocity
+			(1,1)   0.01
+		}
+		
+		R
+		{
+			scaling 1;  
+			(0,0) 0.01
+		}
+
+		x_des
+		{
+			; joint position              
+			(0,0)   0.0 
+			
+		    ; joint velocity
+			(1,0)   0.0
+		}
+	}
+}
+
+
+term1
+{
+	name "final cost"
+	kind "quadratic"   
+	type 1              ; 0 = intermediate, 1 = final
+
+	weights
+	{		
+		; state weighting
+		Q
+		{
+			scaling 100
+
+			; joint position              
+			(0,0)   1.0
+
+			; joint velocity
+			(1,1)   1.0
+		}
+
+		x_des
+		{
+			; joint position              
+			(0,0)   0.0
+			
+		    ; joint velocity
+			(1,0)   0.0
+		}
+	}
+}
+
+; initial position
+x_0
+{
+	; joint position              
+	(0,0)   -3.14
+
+	; joint velocity
+	(1,0)   0.0
+}
+
+
+K_init
+{
+	scaling 0.0
+
+	; joint position              
+	(0,0)   0.0 
+}
+
+
+
+
+

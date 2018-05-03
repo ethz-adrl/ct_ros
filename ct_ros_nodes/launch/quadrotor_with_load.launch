@@ -1,0 +1,25 @@
+<launch>
+	<arg name="task" default="goto" />
+	
+	<node name="rviz" pkg="rviz" type="rviz" respawn="false" output="screen" args="-d $(find ct_ros_nodes)/rviz/quadrotorWithLoadViz.rviz"/>		
+	
+	<param name="quadrotor_description" textfile="$(find ct_models)/urdf/QuadrotorWithLoad/ct_quadrotor.urdf" />
+	
+	<node pkg="robot_state_publisher" type="robot_state_publisher" name="quadrotor_state_publisher">
+ 	  <param name="~tf_prefix" value="quadrotor" type="str"/>
+      <remap from="robot_description" to="quadrotor_description" />
+      <remap from="joint_states" to="current_joint_states" />
+    </node>
+
+    <node pkg="robot_state_publisher" type="robot_state_publisher" name="hya_ref_state_publisher">
+ 		<param name="~tf_prefix" value="quadrotor_ref" type="str"/>
+        <remap from="robot_description" to="quadrotor_description" />
+        <remap from="joint_states" to="reference_joint_states" />
+    </node>
+        
+    <node name="quad_nloc" pkg="ct_ros_nodes" type="QuadrotorNLOC" respawn="false" output="screen" >
+        <param name="skip" value="1" />
+       	<param name="workingDirectory" value="$(find ct_ros_nodes)/config/QuadrotorWithLoad/nloc/$(arg task)" />
+    </node>
+	
+</launch>

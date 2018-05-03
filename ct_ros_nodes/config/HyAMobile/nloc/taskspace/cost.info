@@ -1,0 +1,138 @@
+term0
+{
+	name "intermediate cost base and joint level"
+	kind "quadratic"   
+	type 0              ; 0 = intermediate, 1 = final
+
+	weights
+	{
+		; control penalty
+		R
+		{
+			scaling 0.1
+			
+			; track velocities
+			(0,0) 1.5   
+			(1,1) 1.5 
+			(0,1) -1.15 ; off-diagonal terms for penalizing angular velocity
+			(1,0) -1.15  
+			
+			; joint velocities
+			(2,2) 0.5  
+			(3,3) 0.5  
+			(4,4) 0.5  
+			(5,5) 0.5        
+			(6,6) 0.5
+			(7,7) 0.5 
+		}
+	}
+}
+
+
+term1
+{
+	name "final cost base and joint level"
+	kind "quadratic"   
+	type 1              ; 0 = intermediate, 1 = final
+
+	weights
+	{
+		; state weighting
+		Q
+		{
+			scaling 1.0
+
+			; base position              
+			(0,0)   0.0 
+			(1,1)   0.0
+			
+			; base orientation
+			(2,2)   0.0 
+
+			; joint angles
+			(3,3)  1.0 
+			(4,4)  1.0 
+			(5,5)  1.0 
+			(6,6)  1.0 
+			(7,7)  1.0 
+			(8,8)  1.0 
+		}
+
+        ; the desired final base position is important for computing the arm IK and for initialization
+		x_des
+		{             
+			(0,0)   1.0 ; base position
+			(1,0)   1.0      
+			(2,0)   0.0 ; base orientation
+			(3,0)   0.0 ; joint angles 
+			(4,0)   0.5 
+			(5,0)   -0.5
+			(6,0)   -0.5
+			(7,0)   0.5
+			(8,0)   0.0
+		}
+	}
+}
+
+termTaskSpace_final
+{
+	name "final cost taskspace"
+	kind "quadratic"   
+	type 1              ; 0 = intermediate, 1 = final
+
+	weights
+	{
+		eeId	0
+		
+		evalControlDerivatives 1 ; 0 = false, 1 = true
+		
+		Q_rot 2.0
+		
+		; desired xyz euler angles
+		eulerXyz_des
+		{
+			(0,0) 0.0
+			(1,0) 0.0
+			(2,0) 0.0
+		}
+			
+		; state weighting
+		Q_pos
+		{
+			scaling 3.0
+
+			; position weighting          
+			(0,0)  1
+			(1,1)  1
+			(2,2)  1
+		}
+
+		x_des
+		{
+			; des position        
+			(0,0)   1.3
+			(1,0)   0.75      
+			(2,0)   0.5
+		}
+	}
+}
+
+
+; initial position
+x_0
+{
+			; base position              
+			(0,0)   0.0 
+			(1,0)   0.0
+			
+			; base orientation
+			(2,0)   0.0
+
+			; joint angles
+			(3,0)   0.0 
+			(4,0)   -1.0 
+			(5,0)   1.5
+			(6,0)   1.5
+			(7,0)   0.0
+			(8,0)   0.0
+}

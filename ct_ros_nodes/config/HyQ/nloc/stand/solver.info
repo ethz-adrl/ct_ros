@@ -1,0 +1,34 @@
+timeHorizon 1.0
+
+alg
+{
+	integrator EulerCT
+	discretization Forward_euler
+    dt 0.001
+	K_sim 1
+	K_shot 1
+    epsilon 1e-6
+	max_iterations 5
+    fixedHessianCorrection false
+    recordSmallestEigenvalue false
+    min_cost_improvement 1e-10
+    meritFunctionRho 100
+    closedLoopShooting true
+    nThreads 1
+    nThreadsEigen 1
+    locp_solver HPIPM_SOLVER ; GNRICCATI_SOLVER
+    nlocp_algorithm ILQR
+    loggingPrefix ""
+    printSummary true
+    debugPrint false
+    
+    line_search
+	{
+		active true ;
+		adaptive false ;
+		maxIterations 10 ;
+		alpha_0 1.0 ;
+		n_alpha 0.5 ;
+		debugPrint false
+	}
+}

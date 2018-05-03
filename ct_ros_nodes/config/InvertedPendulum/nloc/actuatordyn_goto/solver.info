@@ -1,0 +1,42 @@
+timeHorizon 3.0
+
+initType    1 ; 0 = steady state ID, 1 = linear
+
+ilqr
+{
+	integrator Euler
+	useSensitivityIntegrator false
+	discretization Forward_euler
+	timeVaryingDiscretization false
+	dt 0.0025
+    K_sim 1
+    K_shot 1
+    epsilon 0e-4
+	max_iterations 180
+    fixedHessianCorrection false
+    recordSmallestEigenvalue false
+    min_cost_improvement 1e-7
+    meritFunctionRho 0.0
+    maxDefectSum 1e-2
+    nThreads 1
+    nThreadsEigen 1
+    ;locp_solver HPIPM_SOLVER
+    locp_solver GNRICCATI_SOLVER
+    nlocp_algorithm GNMS
+    closedLoopShooting true
+    printSummary true
+    debugPrint false
+    logToMatlab false
+    loggingPrefix "~/packages/ct_ros/ct_ros_nodes/examples/InvertedPendulum/matlab/" 
+    
+    
+    line_search
+	{
+		active false ;
+		adaptive false ;
+		maxIterations 10 ;
+		alpha_0 1.0 ;
+		n_alpha 0.5 ;
+		debugPrint false
+	}
+}

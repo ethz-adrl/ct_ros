@@ -1,0 +1,41 @@
+timeHorizon 2.0
+
+initType    1 ; 0 = steady state ID, 1 = linear
+
+nloc
+{
+	integrator Euler
+	useSensitivityIntegrator false
+	discretization Forward_euler
+	timeVaryingDiscretization false   
+	dt 0.007
+    K_sim 1
+    K_shot 1
+    epsilon 1e-6
+	max_iterations 20
+    fixedHessianCorrection false
+    recordSmallestEigenvalue false
+    min_cost_improvement 1e-5
+    meritFunctionRho 0.0
+    maxDefectSum 1e-4
+    nThreads 1
+    nThreadsEigen 1
+    locp_solver HPIPM_SOLVER
+    ;locp_solver GNRICCATI_SOLVER
+    nlocp_algorithm GNMS
+    closedLoopShooting true
+    printSummary true
+    debugPrint false
+    logToMatlab false
+    loggingPrefix "~/packages/ct_ros/ct_ros_nodes/examples/HyA/matlab/GNMS_M_120" 
+    
+    line_search
+	{
+		active false ;
+		adaptive false ;
+		maxIterations 10 ;
+		alpha_0 1.0 ;
+		n_alpha 0.9 ;
+	    debugPrint false
+	}
+}

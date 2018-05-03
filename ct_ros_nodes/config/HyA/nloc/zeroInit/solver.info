@@ -1,0 +1,79 @@
+timeHorizon 3.0
+
+initType    4 ; 0 = steady state ID, 1 = linear
+
+ilqr
+{
+	integrator EulerCT
+	useSensitivityIntegrator false
+	discretization Forward_euler
+	timeVaryingDiscretization false
+	dt 0.001
+    K_sim 1
+    K_shot 1
+    epsilon 0e-6
+	max_iterations 500
+    fixedHessianCorrection false
+    recordSmallestEigenvalue false
+    min_cost_improvement 1e-10
+    meritFunctionRho 0.0
+    maxDefectSum 1e-5
+    nThreads 1
+    nThreadsEigen 4
+    ;locp_solver HPIPM_SOLVER
+    locp_solver GNRICCATI_SOLVER
+    nlocp_algorithm ILQR
+    closedLoopShooting true
+    printSummary true
+    debugPrint false
+    loggingPrefix "~/packages/ct_ros/ct_ros_nodes/examples/HyA/matlab/MS_openloop_Kshot100/dummy" 
+    
+    
+    line_search
+	{
+		active true ;
+		adaptive false ;
+		maxIterations 55 ;
+		alpha_0 1.0 ;
+		n_alpha 0.9 ;
+		debugPrint false
+	}
+}
+
+gnms
+{
+	integrator EulerCT
+	useSensitivityIntegrator false
+	discretization Forward_euler
+	timeVaryingDiscretization false    
+	dt 0.001
+    K_sim 1
+    K_shot 1
+    epsilon 1e-6
+	max_iterations 500
+    fixedHessianCorrection false
+    recordSmallestEigenvalue false
+    min_cost_improvement 1e-10
+    meritFunctionRho 0.0
+    maxDefectSum 1e-5
+    nThreads 1
+    nThreadsEigen 4
+    ;locp_solver HPIPM_SOLVER
+    locp_solver GNRICCATI_SOLVER
+    nlocp_algorithm GNMS
+    closedLoopShooting true
+    printSummary true
+    debugPrint false
+    loggingPrefix "~/packages/ct_ros/ct_ros_nodes/examples/HyA/matlab/MS_closedloop_Kshot100/dummy"
+  
+    
+    line_search
+	{
+		active false ;
+		adaptive false ;
+		maxIterations 55 ;
+		alpha_0 1.0 ;
+		n_alpha 0.9 ;
+		debugPrint false
+	}
+}
