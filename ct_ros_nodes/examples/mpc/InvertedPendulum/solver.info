@@ -1,8 +1,8 @@
 timeHorizon 0.5
 
-initType    0 ; 0 = steady state ID, 1 = linear, 2 = integrated with zero control action, 3 = random; 4=zero
+initType    0 ; 0 = steady state ID, 1 = linear
 
-ilqr
+nloc
 {
     integrator Euler
     useSensitivityIntegrator false

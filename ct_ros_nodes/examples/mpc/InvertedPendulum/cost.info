@@ -16,7 +16,7 @@ term0
 	(0,2)   -150.0    ; off diagonal terms to smooth joint torque
 	
 	; joint velocity
-	(1,1)   0.1
+	(1,1)   0.0
 
     ; motor position
 	(2,2)   150.0  ; off diagonal terms to smooth joint torque
@@ -25,11 +25,11 @@ term0
 
     R
     {
-      scaling 0.02
+      scaling 0.002
 
       ; motor velocity
 
-      (0,0) 0.01
+      (0,0) 0.0001
     }
 
     x_des

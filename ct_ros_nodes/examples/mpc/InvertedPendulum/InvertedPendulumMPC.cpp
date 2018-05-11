@@ -43,7 +43,7 @@ int main(int argc, char* argv[])
 
         // NLOC settings
         ct::optcon::NLOptConSettings nloc_settings;
-        nloc_settings.load(configFile, verbose, "ilqr");
+        nloc_settings.load(configFile, verbose, "nloc");
 
         std::shared_ptr<ct::optcon::TermQuadratic<IPSystem::STATE_DIM, IPSystem::CONTROL_DIM>> termQuadInterm(
             new ct::optcon::TermQuadratic<IPSystem::STATE_DIM, IPSystem::CONTROL_DIM>);
@@ -133,27 +133,29 @@ int main(int argc, char* argv[])
         mpc_settings.delayMeasurementMultiplier_ = 1.0;
         mpc_settings.mpc_mode = ct::optcon::MPC_MODE::CONSTANT_RECEDING_HORIZON;
         mpc_settings.coldStart_ = false;
-        mpc_settings.minimumTimeHorizonMpc_ = 3.0;
 
         ct::optcon::MPC<ct::optcon::NLOptConSolver<IPSystem::STATE_DIM, IPSystem::CONTROL_DIM>> ilqr_mpc(
             optConProblem, ilqr_settings_mpc, mpc_settings);
         ilqr_mpc.setInitialGuess(initialSolution);
+        ipSystem->setController(std::shared_ptr<ct::core::StateFeedbackController<IPSystem::STATE_DIM, IPSystem::CONTROL_DIM>> (
+        		new ct::core::StateFeedbackController<IPSystem::STATE_DIM, IPSystem::CONTROL_DIM>(initialSolution)));
 
 
         std::shared_ptr<ct::ros::RBDStatePublisher> statePublisher( new ct::ros::RBDStatePublisher(
         		ct::models::InvertedPendulum::urdfJointNames(), "/ip/InvertedPendulumBase", "/world"));
         statePublisher->advertise(nh, "/current_joint_states", 10);
 
-        ct::core::Time sim_dt = 0.001;
-        ct::core::Time control_dt = 0.005;
+        ct::core::Time sim_dt;
+        ct::core::loadScalar(configFile, "nloc.dt", sim_dt);
 
-        MPCSimulatorROS<IPSystem> mpc_sim(statePublisher, initialSolution, sim_dt, control_dt, x0, ipSystem, ilqr_mpc);
 
-        std::cout << "waiting 3 second for begin" << std::endl;
-        std::this_thread::sleep_for(std::chrono::seconds(3));
+        MPCSimulatorROS<IPSystem> mpc_sim(statePublisher, initialSolution, sim_dt, sim_dt, x0, ipSystem, ilqr_mpc);
 
-        std::cout << "simulating 30 seconds" << std::endl;
-        mpc_sim.simulate(3.0);
+        std::cout << "waiting 5 second for begin" << std::endl;
+        std::this_thread::sleep_for(std::chrono::seconds(5));
+
+        std::cout << "simulating 10 seconds" << std::endl;
+        mpc_sim.simulate(10.0);
         mpc_sim.finish();
 
         ilqr_mpc.printMpcSummary();
