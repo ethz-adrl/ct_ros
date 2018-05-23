@@ -18,6 +18,7 @@ find_package(catkin REQUIRED
     geometry_msgs
     visualization_msgs 
     dynamic_reconfigure
+    matlab_cpp_interface
     )
 
 find_package(matlab_cpp_interface QUIET)
@@ -101,8 +102,11 @@ endif(BUILD_HYQ_FULL)
 #add_executable(HyAMobileNLOC examples/HyAMobile/kinematic/HyAMobileNLOC.cpp)
 #target_link_libraries(HyAMobileNLOC ${catkin_LIBRARIES} ct_ros_visualization)
 
-add_executable(ex_NLOC_MPC_invertedPendulum examples/mpc/InvertedPendulum/InvertedPendulumMPC.cpp)
-target_link_libraries(ex_NLOC_MPC_invertedPendulum ${catkin_LIBRARIES})
+add_executable(ex_Masspoint examples/Masspoint/NLOC.cpp)
+target_link_libraries(ex_Masspoint ${catkin_LIBRARIES})
+
+#add_executable(ex_NLOC_MPC_invertedPendulum examples/mpc/InvertedPendulum/InvertedPendulumMPC.cpp)
+#target_link_libraries(ex_NLOC_MPC_invertedPendulum ${catkin_LIBRARIES})
 
 find_package(Doxygen)
 if(DOXYGEN_FOUND)
