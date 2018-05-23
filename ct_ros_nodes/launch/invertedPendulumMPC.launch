@@ -1,0 +1,16 @@
+<launch>
+
+    <node name="rviz" pkg="rviz" type="rviz" respawn="false" output="screen" args="-d $(find ct_ros_nodes)/rviz/invertedPendulumViz.rviz"/>		
+    
+    <param name="inverted_pendulum_description" textfile="$(find ct_models)/urdf/InvertedPendulum/InvertedPendulum.urdf" />
+    
+    <node pkg="robot_state_publisher" type="robot_state_publisher" name="inverted_pendulum_state_publisher">
+      <param name="~tf_prefix" value="ip" type="str"/>
+      <remap from="robot_description" to="inverted_pendulum_description" />
+      <remap from="joint_states" to="current_joint_states" />
+    </node>
+        
+    <node name="ex_NLOC_MPC_invertedPendulum" pkg="ct_ros_nodes" type="ex_NLOC_MPC_invertedPendulum" respawn="false" output="screen" >
+    </node>
+	
+</launch>
