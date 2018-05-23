@@ -22,6 +22,15 @@ public:
     typedef typename std::shared_ptr<ct::core::ControlledSystem<STATE_DIM, CONTROL_DIM, SCALAR>> Ptr;
     typedef typename Base::time_t time_t;
 
+    static const SCALAR computeFrictionForceX(const ct::core::StateVector<STATE_DIM, SCALAR>& x,
+        const ct::core::ControlVector<CONTROL_DIM, SCALAR>& control,
+        const double mass,
+        const double mu)
+    {
+        SCALAR Fy_tot = 9.81 * mass + control(1);
+        return Fy_tot * mu * (-x(1));  // TODO get this signum function right!
+    }
+
     // constructor
     Masspoint(double mass, double mu) : mass_(mass), mu_(mu) {}
     // copy constructor
@@ -41,8 +50,8 @@ public:
 
         // second part is the acceleration which is caused by the resulting force
         SCALAR Fx_tot = control(0);
-        SCALAR Fy_tot = 9.81 * mass_ + control(1);
-        SCALAR Fx_res = Fx_tot + Fy_tot * mu_ * (-x(1)); // TODO get this signum function right!
+        //SCALAR Fy_tot = 9.81 * mass_ + control(1);
+        SCALAR Fx_res = Fx_tot + computeFrictionForceX(x, control, mass_, mu_);
 
         derivative(1) = 1 / mass_ * Fx_res;
     }

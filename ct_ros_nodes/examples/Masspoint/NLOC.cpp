@@ -1,6 +1,7 @@
 #include <ct/optcon/optcon.h>
 
 #include "Masspoint.h"
+#include "TermFrictionWork.h"
 #include "../exampleDir.h"
 
 #include <matlabCppInterface/MatFile.hpp>
@@ -21,8 +22,8 @@ int main(int argc, char** argv)
     /* STEP 1: set up the Nonlinear Optimal Control Problem
 	 * First of all, we need to create instances of the system dynamics, the linearized system and the cost function. */
 
-    double mass = 1.0;
-    double mu = 0.1;
+    double mass = 1.0;  // [kg] a wild guess for the weight of a hand-held tool
+    double mu = 0.1;    // [-] a wild guess for a dynamic friction coefficient
     std::shared_ptr<ct::core::ControlledSystem<state_dim, control_dim>> masspointDynamics(
         new Masspoint<double>(mass, mu));
 
@@ -41,9 +42,14 @@ int main(int argc, char** argv)
         new ct::optcon::TermQuadratic<state_dim, control_dim>());
     std::shared_ptr<ct::optcon::TermQuadratic<state_dim, control_dim>> finalCost(
         new ct::optcon::TermQuadratic<state_dim, control_dim>());
-    bool verbose = true;
+    bool verbose = false;
     intermediateCost->loadConfigFile(ct::ros::exampleDir + "/Masspoint/nlocCost.info", "intermediateCost", verbose);
     finalCost->loadConfigFile(ct::ros::exampleDir + "/Masspoint/nlocCost.info", "finalCost", verbose);
+
+    double Q_friction_work;
+    ct::core::loadScalar(ct::ros::exampleDir + "/Masspoint/nlocCost.info", "Q_friction_work", Q_friction_work);
+
+    std::shared_ptr<ct::TermFrictionWork> termFrictionWork(new ct::TermFrictionWork(Q_friction_work, mass, mu));
 
     // Since we are using quadratic cost function terms in this example, the first and second order derivatives are immediately known and we
     // define the cost function to be an "Analytical Cost Function". Let's create the corresponding object and add the previously loaded
@@ -51,6 +57,7 @@ int main(int argc, char** argv)
     std::shared_ptr<CostFunctionQuadratic<state_dim, control_dim>> costFunction(
         new CostFunctionAnalytical<state_dim, control_dim>());
     costFunction->addIntermediateTerm(intermediateCost);
+    costFunction->addIntermediateTerm(termFrictionWork);
     costFunction->addFinalTerm(finalCost);
 
 
@@ -59,7 +66,7 @@ int main(int argc, char** argv)
     StateVector<state_dim> x0;
     x0.setZero();
 
-    ct::core::Time timeHorizon = 3.0;  // and a final time horizon in [sec]
+    ct::core::Time timeHorizon = 1.0;  // and a final time horizon in [sec]
 
 
     // STEP 1-E: create and initialize an "optimal control problem"
@@ -81,8 +88,7 @@ int main(int argc, char** argv)
     ilqr_settings.max_iterations = 10;
     ilqr_settings.nThreads = 1;  // use multi-threading
     ilqr_settings.nlocp_algorithm = NLOptConSettings::NLOCP_ALGORITHM::ILQR;
-    ilqr_settings.lqocp_solver =
-        NLOptConSettings::LQOCP_SOLVER::GNRICCATI_SOLVER;  // solve LQ-problems using custom Riccati solver
+    ilqr_settings.lqocp_solver = NLOptConSettings::LQOCP_SOLVER::GNRICCATI_SOLVER;  // custom Riccati solver
     ilqr_settings.printSummary = true;
 
 
@@ -114,11 +120,10 @@ int main(int argc, char** argv)
     ct::core::StateFeedbackController<state_dim, control_dim> solution = iLQR.getSolution();
 
 
-    std::cout << "Printing the solution trajectory. " << std::endl;
-
-    for (size_t i = 0; i < solution.x_ref().size(); i++)
-        std::cout << "x: \t" << solution.x_ref()[i].transpose() << "\t Forces: \t" << solution.uff()[i].transpose()
-                  << std::endl;
+    //    std::cout << "Printing the solution trajectory. " << std::endl;
+    //    for (size_t i = 0; i < solution.x_ref().size(); i++)
+    //        std::cout << "x: \t" << solution.x_ref()[i].transpose() << "\t Forces: \t" << solution.uff()[i].transpose()
+    //                  << std::endl;
 
     // logging to matlab
     matlab::MatFile matFile;

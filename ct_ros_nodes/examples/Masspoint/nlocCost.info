@@ -1,3 +1,5 @@
+Q_friction_work		2.2;
+
 intermediateCost
 {
     name "intermediate cost quadratic"
@@ -10,11 +12,11 @@ intermediateCost
       {
         scaling 1.0
         (0,0) 0
-        (1,1) 0.1
+        (1,1) 0
       }
       R
       {
-        scaling 1
+        scaling 0.1
         (0,0) 1
         (1,1) 1
       }
@@ -37,7 +39,7 @@ finalCost
     {
       Q
       {
-        scaling 100.0
+        scaling 10.0
         (0,0) 1.0
         (1,1) 1.0
       }
