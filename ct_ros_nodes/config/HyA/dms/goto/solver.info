@@ -27,6 +27,7 @@ dms
         CreateSparseHessian 1
         MaxAssignements 3000;
         Compiler CLANG
+        GenerateSourceCode false;
     }
 
     solver

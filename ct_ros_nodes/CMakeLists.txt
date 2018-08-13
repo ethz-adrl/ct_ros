@@ -108,6 +108,53 @@ target_link_libraries(ex_Masspoint ${catkin_LIBRARIES})
 #add_executable(ex_NLOC_MPC_invertedPendulum examples/mpc/InvertedPendulum/InvertedPendulumMPC.cpp)
 #target_link_libraries(ex_NLOC_MPC_invertedPendulum ${catkin_LIBRARIES})
 
+## dummy nlp libs
+set(NLP_LIBS "")
+
+## include IPOPT
+find_package(ipopt QUIET)
+if(DEFINED ENV{IPOPT_SOURCE_DIR} OR ipopt_FOUND)
+    set(BUILD_WITH_IPOPT_SUPPORT ON)
+    message(STATUS "Found IPOPT - building with IPOPT support")
+    if(ipopt_FOUND)
+      message(STATUS "Using LOCAL installation of IPOPT")
+      set(IPOPT_BUILD_DIR ${CMAKE_BINARY_DIR}/build/include/coin)
+    elseif(DEFINED ENV{IPOPT_SOURCE_DIR})
+      message(STATUS "using GLOBAL installation of IPOPT")
+      set(IPOPT_BUILD_DIR $ENV{IPOPT_SOURCE_DIR}/build)
+    else()
+      message(FATAL_ERROR "ERROR: Ipopt source directory environment variable not set! Set IPOPT_SOURCE_DIR environment variable!")
+    endif(ipopt_FOUND)
+
+    include_directories("${IPOPT_BUILD_DIR}/include/coin")
+    add_definitions( -DBUILD_WITH_IPOPT_SUPPORT )
+    link_directories(${IPOPT_BUILD_DIR}/lib)
+    set(IPOPT_LIBS ipopt dl coinmumps coinhsl lapack blas gfortran
+        m quadmath coinmetis)
+
+endif(DEFINED ENV{IPOPT_SOURCE_DIR} OR ipopt_FOUND)
+
+
+## include SNOPT
+if(DEFINED ENV{SNOPT_SOURCE_DIR})
+    set(BUILD_WITH_SNOPT_SUPPORT ON)
+    message(STATUS "Found SNOPT - building with SNOPT support")
+    include_directories( "$ENV{SNOPT_SOURCE_DIR}/include")
+
+    add_definitions( -DBUILD_WITH_SNOPT_SUPPORT )
+    find_library(SNOPT_LIBRARY1 snopt7_cpp   $ENV{SNOPT_SOURCE_DIR}/lib REQUIRED)
+    find_library(SNOPT_LIBRARY2 snopt7       $ENV{SNOPT_SOURCE_DIR}/lib REQUIRED)
+    set(SNOPT_LIBS ${SNOPT_LIBRARY1} ${SNOPT_LIBRARY2})
+
+    set(CT_SNOPT_LIBS ct_snopt_interface)
+endif(DEFINED ENV{SNOPT_SOURCE_DIR})
+
+set(NLP_LIBS ${IPOPT_LIBS} ${CT_SNOPT_LIBS})
+
+add_executable(HyADMS examples/HyA/HyADMS.cpp)
+target_link_libraries(HyADMS ${catkin_LIBRARIES} ${SNOPT_LIBS} ${IPOPT_LIBS} dl)
+add_dependencies(HyADMS ${PROJECT_NAME}_gencfg)
+
 find_package(Doxygen)
 if(DOXYGEN_FOUND)
     
