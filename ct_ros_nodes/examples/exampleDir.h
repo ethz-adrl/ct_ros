@@ -8,7 +8,7 @@ Licensed under Apache2 license (see LICENSE file in main directory)
 namespace ct {
 namespace ros {
 
-static const std::string exampleDir = "/home/gimarkus/catkin_new/src/ct_ros/ct_ros_nodes/examples";
+static const std::string exampleDir = "/home/markusta/catkin_optcon/src/ct_ros/ct_ros_nodes/examples";
 
 }
 }

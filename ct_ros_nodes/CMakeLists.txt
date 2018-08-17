@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 2.8.3)
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../ct/ct/cmake/compilerSettings.cmake)
 
 project(ct_ros_nodes)
+include(${CMAKE_CURRENT_SOURCE_DIR}/../../ct/ct_optcon/cmake/externalSolvers.cmake)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -93,8 +94,8 @@ endif(BUILD_HYQ_FULL)
 #add_executable(HyQVisualization examples/HyQ/HyQVisualization.cpp)
 #target_link_libraries(HyQVisualization ${catkin_LIBRARIES} )
 
-#add_executable(HyANLOC examples/HyA/HyANLOC.cpp)
-#target_link_libraries(HyANLOC ${catkin_LIBRARIES})
+add_executable(HyANLOC examples/HyA/HyANLOC.cpp)
+target_link_libraries(HyANLOC ${catkin_LIBRARIES})
 
 #add_executable(HyANLOC_TaskSpace examples/HyA/HyANLOC_TaskSpace.cpp)
 #target_link_libraries(HyANLOC_TaskSpace ${catkin_LIBRARIES} ct_ros_visualization)
@@ -107,49 +108,6 @@ target_link_libraries(ex_Masspoint ${catkin_LIBRARIES})
 
 #add_executable(ex_NLOC_MPC_invertedPendulum examples/mpc/InvertedPendulum/InvertedPendulumMPC.cpp)
 #target_link_libraries(ex_NLOC_MPC_invertedPendulum ${catkin_LIBRARIES})
-
-## dummy nlp libs
-set(NLP_LIBS "")
-
-## include IPOPT
-find_package(ipopt QUIET)
-if(DEFINED ENV{IPOPT_SOURCE_DIR} OR ipopt_FOUND)
-    set(BUILD_WITH_IPOPT_SUPPORT ON)
-    message(STATUS "Found IPOPT - building with IPOPT support")
-    if(ipopt_FOUND)
-      message(STATUS "Using LOCAL installation of IPOPT")
-      set(IPOPT_BUILD_DIR ${CMAKE_BINARY_DIR}/build/include/coin)
-    elseif(DEFINED ENV{IPOPT_SOURCE_DIR})
-      message(STATUS "using GLOBAL installation of IPOPT")
-      set(IPOPT_BUILD_DIR $ENV{IPOPT_SOURCE_DIR}/build)
-    else()
-      message(FATAL_ERROR "ERROR: Ipopt source directory environment variable not set! Set IPOPT_SOURCE_DIR environment variable!")
-    endif(ipopt_FOUND)
-
-    include_directories("${IPOPT_BUILD_DIR}/include/coin")
-    add_definitions( -DBUILD_WITH_IPOPT_SUPPORT )
-    link_directories(${IPOPT_BUILD_DIR}/lib)
-    set(IPOPT_LIBS ipopt dl coinmumps coinhsl lapack blas gfortran
-        m quadmath coinmetis)
-
-endif(DEFINED ENV{IPOPT_SOURCE_DIR} OR ipopt_FOUND)
-
-
-## include SNOPT
-if(DEFINED ENV{SNOPT_SOURCE_DIR})
-    set(BUILD_WITH_SNOPT_SUPPORT ON)
-    message(STATUS "Found SNOPT - building with SNOPT support")
-    include_directories( "$ENV{SNOPT_SOURCE_DIR}/include")
-
-    add_definitions( -DBUILD_WITH_SNOPT_SUPPORT )
-    find_library(SNOPT_LIBRARY1 snopt7_cpp   $ENV{SNOPT_SOURCE_DIR}/lib REQUIRED)
-    find_library(SNOPT_LIBRARY2 snopt7       $ENV{SNOPT_SOURCE_DIR}/lib REQUIRED)
-    set(SNOPT_LIBS ${SNOPT_LIBRARY1} ${SNOPT_LIBRARY2})
-
-    set(CT_SNOPT_LIBS ct_snopt_interface)
-endif(DEFINED ENV{SNOPT_SOURCE_DIR})
-
-set(NLP_LIBS ${IPOPT_LIBS} ${CT_SNOPT_LIBS})
 
 add_executable(HyADMS examples/HyA/HyADMS.cpp)
 target_link_libraries(HyADMS ${catkin_LIBRARIES} ${SNOPT_LIBS} ${IPOPT_LIBS} dl)
