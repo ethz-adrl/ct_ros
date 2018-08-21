@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 2.8.3)
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../ct/ct/cmake/compilerSettings.cmake)
 
 project(ct_ros_nodes)
+include(${CMAKE_CURRENT_SOURCE_DIR}/../../ct/ct_optcon/cmake/externalSolvers.cmake)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -93,8 +94,8 @@ endif(BUILD_HYQ_FULL)
 #add_executable(HyQVisualization examples/HyQ/HyQVisualization.cpp)
 #target_link_libraries(HyQVisualization ${catkin_LIBRARIES} )
 
-#add_executable(HyANLOC examples/HyA/HyANLOC.cpp)
-#target_link_libraries(HyANLOC ${catkin_LIBRARIES})
+add_executable(HyANLOC examples/HyA/HyANLOC.cpp)
+target_link_libraries(HyANLOC ${catkin_LIBRARIES})
 
 #add_executable(HyANLOC_TaskSpace examples/HyA/HyANLOC_TaskSpace.cpp)
 #target_link_libraries(HyANLOC_TaskSpace ${catkin_LIBRARIES} ct_ros_visualization)
@@ -107,6 +108,10 @@ target_link_libraries(ex_Masspoint ${catkin_LIBRARIES})
 
 #add_executable(ex_NLOC_MPC_invertedPendulum examples/mpc/InvertedPendulum/InvertedPendulumMPC.cpp)
 #target_link_libraries(ex_NLOC_MPC_invertedPendulum ${catkin_LIBRARIES})
+
+add_executable(HyADMS examples/HyA/HyADMS.cpp)
+target_link_libraries(HyADMS ${catkin_LIBRARIES} ${SNOPT_LIBS} ${IPOPT_LIBS} dl)
+add_dependencies(HyADMS ${PROJECT_NAME}_gencfg)
 
 find_package(Doxygen)
 if(DOXYGEN_FOUND)
