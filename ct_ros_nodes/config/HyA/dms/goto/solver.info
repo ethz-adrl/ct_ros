@@ -2,17 +2,17 @@ timeHorizon 5.0
 
 dms
 {
-    N 	20			            ; number of shots
+    N   20                      ; number of shots
     T   5.0                     ; the movement duration
-    nThreads		  1		    ; 
+    nThreads          1         ; 
     InterpolationType 0         ; ZeroOrderHold = 0, PiecewiseLinear = 1
     CostEvaluationType 1        ; simple = 0, full = 1
     ObjectiveType   0           ; keepTkeepGrid = 0, optimizeGrid = 1
-    h_min 0.1				    ; minimum shot time 
-    IntegrationType 0		    ; Euler = 0, RK4 = 1, RK5 = 2
+    h_min 0.1                   ; minimum shot time 
+    IntegrationType 0           ; Euler = 0, RK4 = 1, RK5 = 2
     dt_sim  0.25                 ; dt for forward integration
-    AbsErrTol     1e-5			; absolute error Tolerance
-    RelErrTol     1e-5			; relative error Tolerance
+    AbsErrTol     1e-5          ; absolute error Tolerance
+    RelErrTol     1e-5          ; relative error Tolerance
 
     cppad
     {
