@@ -1,7 +1,9 @@
 <launch>
 	<arg name="task" default="goto" />
 
-	<node name="rviz" pkg="rviz" type="rviz" respawn="false" output="screen"/>	
+  <arg name="rviz_config_path" default="$(find ct_ros_nodes)/config/HyA/dms/rviz/hya_dms.rviz"/>
+
+	<node name="rviz" pkg="rviz" type="rviz" args="--display-config $(arg rviz_config_path)" respawn="false" output="screen"/>	
 	<param name="hya_description" textfile="$(find ct_models)/urdf/HyA/HyA.urdf" />
 	
 	<node pkg="robot_state_publisher" type="robot_state_publisher" name="hya_state_publisher" >

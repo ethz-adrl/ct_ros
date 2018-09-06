@@ -50,6 +50,9 @@ void visualizeTrajectory(ct::ros::RBDStatePublisher& publisher, const ct::core::
 
     for (size_t i=0; i<x.size(); i++)
     {
+        if(!ros::ok()) 
+            return;
+
         RBDState<njoints> state;
         try {
             for (int j=0; j<x[j].size(); j++)
