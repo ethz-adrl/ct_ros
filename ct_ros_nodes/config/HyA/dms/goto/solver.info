@@ -2,56 +2,56 @@ timeHorizon 5.0
 
 dms
 {
-    N 	20			            ; number of shots
+    N   20                      ; number of shots
     T   5.0                     ; the movement duration
-    nThreads		  1		    ; 
+    nThreads 1                  ; number of threads
     InterpolationType 0         ; ZeroOrderHold = 0, PiecewiseLinear = 1
     CostEvaluationType 1        ; simple = 0, full = 1
-    ObjectiveType   0           ; keepTkeepGrid = 0, optimizeGrid = 1
-    h_min 0.1				    ; minimum shot time 
-    IntegrationType 0		    ; Euler = 0, RK4 = 1, RK5 = 2
-    dt_sim  0.25                 ; dt for forward integration
-    AbsErrTol     1e-5			; absolute error Tolerance
-    RelErrTol     1e-5			; relative error Tolerance
+    ObjectiveType 0             ; keepTkeepGrid = 0, optimizeGrid = 1
+    h_min 0.1                   ; minimum shot time 
+    IntegrationType 0           ; Euler = 0, RK4 = 1, RK5 = 2
+    dt_sim  0.25                ; dt for forward integration
+    AbsErrTol 1e-5              ; absolute error Tolerance
+    RelErrTol 1e-5              ; relative error Tolerance
 
     cppad
     {
-        MultiThreading 0;
-        CreateForwardZero 1;
-        CreateForwardOne 0;
-        CreateReverseOne 0;
-        CreateReverseTwo 0;
-        CreateJacobian 0;
-        CreateSparseJacobian 1;
-        CreateHessian 0;
+        MultiThreading 0
+        CreateForwardZero 1
+        CreateForwardOne 0
+        CreateReverseOne 0
+        CreateReverseTwo 0
+        CreateJacobian 0
+        CreateSparseJacobian 1
+        CreateHessian 0
         CreateSparseHessian 1
-        MaxAssignements 3000;
+        MaxAssignements 3000
         Compiler CLANG
-        GenerateSourceCode false;
+        GenerateSourceCode false
     }
 
     solver
     {
-        SolverType 0                ; 0 = IPOPT, 1= SNOPT
-        UseGeneratedCostGradient 0       ;
+        SolverType 0                   ; 0 = IPOPT, 1= SNOPT
+        UseGeneratedCostGradient 0     
         UseGeneratedConstraintJacobian 0
 
         ipopt
         {
-            CheckDerivatives 0;
-            MaxIterations 500;
-            Verbosity       5;
-            OptimalityTolerance 1e-5 ;
+            CheckDerivatives 0
+            MaxIterations 500
+            Verbosity 5
+            OptimalityTolerance 1e-5 
             ExactHessian 0;
         }
 
         snopt
         {
-            MaxMinorIterations      500 ;
-            MaxMajorIterations      500 ;
-            MinorPrintLevelVerbosity 0 ;
-            MajorPrintLevelVerbosity 1 ;
-            OptimalityTolerance 1e-5 ;
+            MaxMinorIterations 500
+            MaxMajorIterations 500
+            MinorPrintLevelVerbosity 0
+            MajorPrintLevelVerbosity 1
+            OptimalityTolerance 1e-5
         }
 
     }
