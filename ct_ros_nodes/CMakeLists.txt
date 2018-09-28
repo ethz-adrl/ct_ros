@@ -94,17 +94,23 @@ endif(BUILD_HYQ_FULL)
 #add_executable(HyQVisualization examples/HyQ/HyQVisualization.cpp)
 #target_link_libraries(HyQVisualization ${catkin_LIBRARIES} )
 
-add_executable(HyANLOC examples/HyA/HyANLOC.cpp)
-target_link_libraries(HyANLOC ${catkin_LIBRARIES})
+#add_executable(HyANLOC examples/HyA/HyANLOC.cpp)
+#target_link_libraries(HyANLOC ${catkin_LIBRARIES})
 
 #add_executable(HyANLOC_TaskSpace examples/HyA/HyANLOC_TaskSpace.cpp)
 #target_link_libraries(HyANLOC_TaskSpace ${catkin_LIBRARIES} ct_ros_visualization)
 
+#add_executable(HyANLOC_TaskSpaceVel examples/HyA/HyANLOC_TaskSpaceVel.cpp)
+#target_link_libraries(HyANLOC_TaskSpaceVel ${catkin_LIBRARIES} ct_ros_visualization)
+
+add_executable(HyANLOC_TaskSpaceAcc examples/HyA/HyANLOC_TaskSpaceAcc.cpp)
+target_link_libraries(HyANLOC_TaskSpaceAcc ${catkin_LIBRARIES} ct_ros_visualization)
+
 #add_executable(HyAMobileNLOC examples/HyAMobile/kinematic/HyAMobileNLOC.cpp)
 #target_link_libraries(HyAMobileNLOC ${catkin_LIBRARIES} ct_ros_visualization)
 
-add_executable(ex_Masspoint examples/Masspoint/NLOC.cpp)
-target_link_libraries(ex_Masspoint ${catkin_LIBRARIES})
+#add_executable(ex_Masspoint examples/Masspoint/NLOC.cpp)
+#target_link_libraries(ex_Masspoint ${catkin_LIBRARIES})
 
 #add_executable(ex_NLOC_MPC_invertedPendulum examples/mpc/InvertedPendulum/InvertedPendulumMPC.cpp)
 #target_link_libraries(ex_NLOC_MPC_invertedPendulum ${catkin_LIBRARIES})

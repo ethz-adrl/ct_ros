@@ -1,4 +1,6 @@
 *.project
+*.cproject
+*.settings
 *~
 Doxyfile
 exampleDir.h
