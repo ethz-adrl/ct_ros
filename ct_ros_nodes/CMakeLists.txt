@@ -19,7 +19,6 @@ find_package(catkin REQUIRED
     geometry_msgs
     visualization_msgs 
     dynamic_reconfigure
-    matlab_cpp_interface
     )
 
 find_package(matlab_cpp_interface QUIET)
