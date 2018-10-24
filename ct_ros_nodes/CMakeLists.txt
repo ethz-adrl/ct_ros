@@ -19,7 +19,6 @@ find_package(catkin REQUIRED
     geometry_msgs
     visualization_msgs 
     dynamic_reconfigure
-    matlab_cpp_interface
     )
 
 find_package(matlab_cpp_interface QUIET)
@@ -68,56 +67,62 @@ add_library(ct_ros_visualization
     src/visualizer/colorMapping.cpp
 )
 
-
 set(CT_ROS_EXAMPLE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/examples")
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/examples/exampleDir.h.in ${CMAKE_CURRENT_SOURCE_DIR}/examples/exampleDir.h)
 
-#add_executable(InvertedPendulumNLOC examples/InvertedPendulum/InvertedPendulumNLOC.cpp)
-#target_link_libraries(InvertedPendulumNLOC ${catkin_LIBRARIES})
+if(BUILD_EXAMPLES)
 
-#add_executable(InvertedPendulumNLOC_actDyn examples/InvertedPendulum/InvertedPendulumNLOC_actDyn.cpp)
-#target_link_libraries(InvertedPendulumNLOC_actDyn ${catkin_LIBRARIES})
+    #add_executable(InvertedPendulumNLOC examples/InvertedPendulum/InvertedPendulumNLOC.cpp)
+    #target_link_libraries(InvertedPendulumNLOC ${catkin_LIBRARIES})
+    
+    #add_executable(InvertedPendulumNLOC_actDyn examples/InvertedPendulum/InvertedPendulumNLOC_actDyn.cpp)
+    #target_link_libraries(InvertedPendulumNLOC_actDyn ${catkin_LIBRARIES})
+    
+    add_executable(QuadrotorNLOC examples/Quadrotor/QuadrotorNLOC.cpp)
+    target_link_libraries(QuadrotorNLOC ${catkin_LIBRARIES})
+    
+    if(BUILD_HYQ_FULL)
+        add_executable(HyQNLOCContactModel examples/HyQ/HyQNLOCContactModel.cpp)
+        target_link_libraries(HyQNLOCContactModel ${catkin_LIBRARIES})
+        add_dependencies(HyQNLOCContactModel ${PROJECT_NAME}_gencfg)
+    endif(BUILD_HYQ_FULL)
+    
+    #add_executable(HyQSimulator examples/HyQ/HyQSimulator.cpp)
+    #target_link_libraries(HyQSimulator ${catkin_LIBRARIES})
+    #add_dependencies(HyQSimulator ${PROJECT_NAME}_gencfg)
+    
+    #add_executable(HyQVisualization examples/HyQ/HyQVisualization.cpp)
+    #target_link_libraries(HyQVisualization ${catkin_LIBRARIES} )
+    
+    add_executable(HyANLOC examples/HyA/HyANLOC.cpp)
+    target_link_libraries(HyANLOC ${catkin_LIBRARIES})
+    
+    add_executable(HyANLOC_TaskSpace examples/HyA/HyANLOC_TaskSpace.cpp)
+    target_link_libraries(HyANLOC_TaskSpace ${catkin_LIBRARIES} ct_ros_visualization)
+    
+    add_executable(HyANLOC_TaskSpaceVel examples/HyA/HyANLOC_TaskSpaceVel.cpp)
+    target_link_libraries(HyANLOC_TaskSpaceVel ${catkin_LIBRARIES} ct_ros_visualization)
+    
+    add_executable(HyANLOC_TaskSpaceAcc examples/HyA/HyANLOC_TaskSpaceAcc.cpp)
+    target_link_libraries(HyANLOC_TaskSpaceAcc ${catkin_LIBRARIES} ct_ros_visualization)
+    
+    add_executable(HyA_NLP_IK examples/HyA/HyA_NLP_IK.cpp) 
+    target_link_libraries(HyA_NLP_IK ${catkin_LIBRARIES} ct_ros_visualization ${SNOPT_LIBS} ${IPOPT_LIBS} dl)
+    
+    #add_executable(HyAMobileNLOC examples/HyAMobile/kinematic/HyAMobileNLOC.cpp)
+    #target_link_libraries(HyAMobileNLOC ${catkin_LIBRARIES} ct_ros_visualization)
+    
+    add_executable(ex_Masspoint examples/Masspoint/NLOC.cpp)
+    target_link_libraries(ex_Masspoint ${catkin_LIBRARIES})
+    
+    add_executable(ex_NLOC_MPC_invertedPendulum examples/mpc/InvertedPendulum/InvertedPendulumMPC.cpp)
+    target_link_libraries(ex_NLOC_MPC_invertedPendulum ${catkin_LIBRARIES})
+    
+    add_executable(HyADMS examples/HyA/HyADMS.cpp)
+    target_link_libraries(HyADMS ${catkin_LIBRARIES} ${SNOPT_LIBS} ${IPOPT_LIBS} dl)
+    add_dependencies(HyADMS ${PROJECT_NAME}_gencfg)
 
-#add_executable(QuadrotorNLOC examples/Quadrotor/QuadrotorNLOC.cpp)
-#target_link_libraries(QuadrotorNLOC ${catkin_LIBRARIES})
-
-if(BUILD_HYQ_FULL)
-    add_executable(HyQNLOCContactModel examples/HyQ/HyQNLOCContactModel.cpp)
-    target_link_libraries(HyQNLOCContactModel ${catkin_LIBRARIES})
-    add_dependencies(HyQNLOCContactModel ${PROJECT_NAME}_gencfg)
-endif(BUILD_HYQ_FULL)
-
-#add_executable(HyQSimulator examples/HyQ/HyQSimulator.cpp)
-#target_link_libraries(HyQSimulator ${catkin_LIBRARIES})
-#add_dependencies(HyQSimulator ${PROJECT_NAME}_gencfg)
-
-#add_executable(HyQVisualization examples/HyQ/HyQVisualization.cpp)
-#target_link_libraries(HyQVisualization ${catkin_LIBRARIES} )
-
-#add_executable(HyANLOC examples/HyA/HyANLOC.cpp)
-#target_link_libraries(HyANLOC ${catkin_LIBRARIES})
-
-#add_executable(HyANLOC_TaskSpace examples/HyA/HyANLOC_TaskSpace.cpp)
-#target_link_libraries(HyANLOC_TaskSpace ${catkin_LIBRARIES} ct_ros_visualization)
-
-#add_executable(HyANLOC_TaskSpaceVel examples/HyA/HyANLOC_TaskSpaceVel.cpp)
-#target_link_libraries(HyANLOC_TaskSpaceVel ${catkin_LIBRARIES} ct_ros_visualization)
-
-add_executable(HyANLOC_TaskSpaceAcc examples/HyA/HyANLOC_TaskSpaceAcc.cpp)
-target_link_libraries(HyANLOC_TaskSpaceAcc ${catkin_LIBRARIES} ct_ros_visualization)
-
-#add_executable(HyAMobileNLOC examples/HyAMobile/kinematic/HyAMobileNLOC.cpp)
-#target_link_libraries(HyAMobileNLOC ${catkin_LIBRARIES} ct_ros_visualization)
-
-#add_executable(ex_Masspoint examples/Masspoint/NLOC.cpp)
-#target_link_libraries(ex_Masspoint ${catkin_LIBRARIES})
-
-#add_executable(ex_NLOC_MPC_invertedPendulum examples/mpc/InvertedPendulum/InvertedPendulumMPC.cpp)
-#target_link_libraries(ex_NLOC_MPC_invertedPendulum ${catkin_LIBRARIES})
-
-add_executable(HyADMS examples/HyA/HyADMS.cpp)
-target_link_libraries(HyADMS ${catkin_LIBRARIES} ${SNOPT_LIBS} ${IPOPT_LIBS} dl)
-add_dependencies(HyADMS ${PROJECT_NAME}_gencfg)
+endif()
 
 find_package(Doxygen)
 if(DOXYGEN_FOUND)
