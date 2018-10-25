@@ -8,7 +8,7 @@ nloc
 	useSensitivityIntegrator false
 	discretization Forward_euler
 	timeVaryingDiscretization false   
-	dt 0.01
+	dt 0.05
     K_sim 1
     K_shot 1
     epsilon 1e-6
