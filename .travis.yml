@@ -78,5 +78,5 @@ script:
   - catkin clean --all
   - catkin config --blacklist ct_doc
   - catkin build ct_models -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="-w"
-  - catkin build ct_ros_nodes  -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="-w"
+  - catkin build ct_ros_nodes -v -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="-w"
 
