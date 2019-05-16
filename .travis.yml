@@ -50,12 +50,12 @@ before_install:
 
 
   - sudo apt-get update                 
-  ## get lapack
   - sudo apt-get install liblapack-dev
-  ## get eigen3
   - sudo apt-get install libeigen3-dev
-  ## get cmake
   - sudo apt-get install cmake
+  - sudo apt-get install ros-kinetic-tf2
+  - sudo apt-get install ros-kinetic-dynamic-reconfigure
+
 
 # Create a catkin workspace with the package under integration.
 install:
