@@ -48,6 +48,15 @@ before_install:
   - sudo rosdep init  >/dev/null # suppress output
   - rosdep update  >/dev/null # suppress output
 
+
+  - sudo apt-get update                 
+  ## get lapack
+  - sudo apt-get install liblapack-dev
+  ## get eigen3
+  - sudo apt-get install libeigen3-dev
+  ## get cmake
+  - sudo apt-get install cmake
+
 # Create a catkin workspace with the package under integration.
 install:
   - mkdir -p ~/catkin_ws/src
