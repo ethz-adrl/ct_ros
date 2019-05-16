@@ -1,6 +1,6 @@
 /**********************************************************************************************************************
 This file is part of the Control Toolbox (https://adrlab.bitbucket.io/ct), copyright by ETH Zurich
-Licensed under Apache2 license (see LICENSE file in main directory)
+Licensed under BSD-2 license (see LICENSE file in main directory)
 **********************************************************************************************************************/
 
 #include <ct/rbd/rbd.h>

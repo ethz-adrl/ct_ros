@@ -1,6 +1,6 @@
 /**********************************************************************************************************************
-This file is part of the Control Toolbox (https://adrlab.bitbucket.io/ct), copyright by ETH Zurich, Google Inc.
-Licensed under Apache2 license (see LICENSE file in main directory)
+This file is part of the Control Toolbox (https://github.com/ethz-adrl/control-toolbox), copyright by ETH Zurich.
+Licensed under BSD-2 license (see LICENSE file in main directory)
 **********************************************************************************************************************/
 
 //#define MATLAB
@@ -151,13 +151,6 @@ int main(int argc, char* argv[])
     std::shared_ptr<TermTaskspacePoseCG> termTaskSpace_final(
         new TermTaskspacePoseCG(costFunctionFile, "termTaskSpace_final", true));
     size_t task_space_term_id = costFun->addFinalTerm(termTaskSpace_final, true);
-
-
-    // task-space regularization term
-//    using EERegularizationTerm = ct::optcon::EERegularizationTerm<njoints, njoints, HyAKinematics_t>;
-//    std::shared_ptr<EERegularizationTerm> termTaskSpace_reg(new EERegularizationTerm(costFunctionFile, "termTaskSpace_reg", true));
-//    size_t reg_term_id = costFun->addFinalTerm(termTaskSpace_reg, true);
-
 
     ROS_INFO("Solving Inverse Kinematics for Initial Guess");
     ct::rbd::RigidBodyPose ee_pose_des = termTaskSpace_final->getReferencePose();
