@@ -1,6 +1,5 @@
 # Control Toolbox ROS and Robot Examples
 
-![Travis (.org) branch](https://img.shields.io/travis/ethz-adrl/ct_ros/master.svg?style=popout-square)
 ![GitHub top language](https://img.shields.io/github/languages/top/ethz-adrl/ct_ros.svg?style=social)
 ![GitHub](https://img.shields.io/github/license/ethz-adrl/ct_ros.svg?style=social)
 
