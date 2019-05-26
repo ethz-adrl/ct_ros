@@ -204,7 +204,7 @@ int main(int argc, char* argv[])
     {  // we need these brackets to make sure the archive goes out of scope and flushes
         std::ofstream outXML(outputFile);
         cereal::XMLOutputArchive archive_o_xml(outXML);
-        archive_o_xml(CEREAL_NVP(x_nloc.toImplementation()));
+        archive_o_xml(CEREAL_NVP(x_nloc);
         archive_o_xml(cereal::make_nvp("dt", nloc.getSettings().dt));
     }
     ROS_INFO("Logging complete.");
@@ -258,7 +258,7 @@ void callback(ct_ros_nodes::SimulationConfig& config, uint32_t level)
 {
     std::cout << "setting initial pose and contact model parameters" << std::endl;
 
-    x0.basePose().position().toImplementation() << config.x_init, config.y_init, config.z_init;
+    x0.basePose().position() << config.x_init, config.y_init, config.z_init;
 
     if (config.reset)
     {

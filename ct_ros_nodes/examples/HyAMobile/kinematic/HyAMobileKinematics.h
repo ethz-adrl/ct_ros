@@ -1,6 +1,5 @@
 /**********************************************************************************************************************
 This file is part of the Control Toolbox (https://github.com/ethz-adrl/control-toolbox), copyright by ETH Zurich.
-Authors:  Michael Neunert, Markus Giftthaler, Markus Stäuble, Diego Pardo, Farbod Farshidian
 Licensed under BSD-2 license (see LICENSE file in main directory)
 **********************************************************************************************************************/
 
@@ -109,7 +108,7 @@ public:
      * @param jointPosition current joint position
      * @return
      */
-    kindr::Position<SCALAR, 3> getEEPositionInWorld(const size_t eeInd,
+    Eigen::Matrix<SCALAR, 3, 1> getEEPositionInWorld(const size_t eeInd,
         const RigidBodyPoseTpl& w_pose_base,
         const JointPositionTpl& jointPosition)
     {
@@ -120,7 +119,7 @@ public:
     }
 
 
-    kindr::Velocity<SCALAR, 3> getEEVelocityInWorld(size_t eeId, const ct::rbd::RBDState<NJOINTS, SCALAR>& rbdState)
+    Eigen::Matrix<SCALAR, 3, 1> getEEVelocityInWorld(size_t eeId, const ct::rbd::RBDState<NJOINTS, SCALAR>& rbdState)
     {
         return hyaKinematics_.getEEVelocityInWorld(eeId, rbdState);
     }
@@ -162,24 +161,20 @@ public:
         rbdState.joints().getPositions() = toJointPositions(state);
         rbdState.joints().getVelocities() = control.template tail<NJOINTS>();
 
-        (rbdState.base().pose().position().toImplementation())(0) = state(0);     // base x position
-        (rbdState.base().pose().position().toImplementation())(1) = state(1);     // base y position
-        (rbdState.base().pose().position().toImplementation())(2) = SCALAR(0.0);  // base z position (0.0 by definition)
+        (rbdState.base().pose().position()(0) = state(0);     // base x position
+        (rbdState.base().pose().position()(1) = state(1);     // base y position
+        (rbdState.base().pose().position()(2) = SCALAR(0.0);  // base z position (0.0 by definition)
 
         Eigen::Matrix<SCALAR, 3, 1> derivativeBase = computeDerivativeBase(state, control);
-        (rbdState.base().velocities().getTranslationalVelocity().toImplementation())(0) =
+        (rbdState.base().velocities().getTranslationalVelocity())(0) =
             derivativeBase(0);  // base x velocity
-        (rbdState.base().velocities().getTranslationalVelocity().toImplementation())(1) =
+        (rbdState.base().velocities().getTranslationalVelocity())(1) =
             derivativeBase(1);  // base y velocity
-        (rbdState.base().velocities().getTranslationalVelocity().toImplementation())(2) =
+        (rbdState.base().velocities().getTranslationalVelocity())(2) =
             (SCALAR)0.0;  // base z velocity (0.0 by definition)
 
         // set base orientation (only z axis)
-        kindr::EulerAnglesXyz<SCALAR> eulerXyz;
-        eulerXyz.setX((SCALAR)0.0);
-        eulerXyz.setY((SCALAR)0.0);
-        eulerXyz.setZ(state(2));
-        rbdState.base().pose().setFromEulerAnglesXyz(eulerXyz);
+        rbdState.base().pose().setFromEulerAnglesXyz((SCALAR)0.0, (SCALAR)0.0, state(2));
 
         return rbdState;
     }
@@ -202,9 +197,9 @@ public:
         rbdState.setZero();
         rbdState.joints().getPositions() = state.template tail<NJOINTS>();
 
-        (rbdState.base().pose().position().toImplementation())(0) = w_pose_flange.position()(0);  // set base x position
-        (rbdState.base().pose().position().toImplementation())(1) = w_pose_flange.position()(1);  // set base y position
-        (rbdState.base().pose().position().toImplementation())(2) = w_pose_flange.position()(2);  // set base z position
+        (rbdState.base().pose().position()(0) = w_pose_flange.position()(0);  // set base x position
+        (rbdState.base().pose().position()(1) = w_pose_flange.position()(1);  // set base y position
+        (rbdState.base().pose().position()(2) = w_pose_flange.position()(2);  // set base z position
 
         // set base orientation
         rbdState.base().pose().setFromEulerAnglesXyz(w_pose_flange.getEulerAnglesXyz());
@@ -217,13 +212,14 @@ public:
     {
         // flange coordinate system position expressed in world frame
         Vector3Tpl w_p_flange =
-            w_pose_base.position().toImplementation() + w_pose_base.template rotateBaseToInertia(base_p_flange_);
+            w_pose_base.position() + w_pose_base.template rotateBaseToInertia(base_p_flange_);
 
         //! \warning this only works because we have a two-dimensional planar rotation!!!! Otherwise, we cannot use a simple sum
         //! (the underlying assumption is that we rotate only about the z axis)
-        kindr::EulerAnglesXyz<SCALAR> w_q_flange(w_pose_base.getEulerAnglesXyz().toImplementation() + base_q_flange_);
+        typename RigidBodyPoseTpl::EulerAnglesXYZTpl w_q_flange = w_pose_base.getEulerAnglesXyz();
+        w_q_flange.angles() += base_q_flange_;
 
-        return RigidBodyPoseTpl(w_q_flange, kindr::Position<SCALAR, 3>(w_p_flange), RigidBodyPoseTpl::EULER);
+        return RigidBodyPoseTpl(w_q_flange, w_p_flange, RigidBodyPoseTpl::EULER);
     }
 
     //! create a random sample for a base pose in a circle around a desired ee-pose
@@ -232,7 +228,7 @@ public:
     {
         Eigen::Matrix<SCALAR, 3, 1> sampledBaseState;
 
-        Eigen::Matrix<SCALAR, 3, 1> ee_position_projected = w_pose_ee.position().toImplementation();
+        Eigen::Matrix<SCALAR, 3, 1> ee_position_projected = w_pose_ee.position();
         ct::core::UniformNoise xProb(ee_position_projected(0), halfwidth);
         ct::core::UniformNoise yProb(ee_position_projected(1), halfwidth);
         ct::core::UniformNoise thProb(0.0, M_PI);

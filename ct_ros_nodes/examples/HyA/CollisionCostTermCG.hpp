@@ -62,7 +62,7 @@ public:
         // delegate constructor
         : CollisionCostTermCG(eeInd,
               Qpos,
-              rbdPose.position().toImplementation(),
+              rbdPose.position(),
               name)
     {
     }
@@ -294,7 +294,7 @@ private:
 
         // position difference in world frame
         Eigen::Matrix<SC, 3, 1> xCurr =
-            kinematics_.getEEPositionInWorld(eeInd_, rbdState.basePose(), rbdState.jointPositions()).toImplementation();
+            kinematics_.getEEPositionInWorld(eeInd_, rbdState.basePose(), rbdState.jointPositions());
         Eigen::Matrix<SC, 3, 1> xDiff = xCurr - w_p_ref;
 
         // compute the quadratic cost from the spheric obstacle

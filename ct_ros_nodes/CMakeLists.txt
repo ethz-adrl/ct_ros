@@ -25,8 +25,6 @@ if(cereal_FOUND)
     include_directories(${cereal_INCLUDE_DIRS})
 endif()
 
-option(BUILD_HYQ_FULL "Compile all examples for HyQ (takes long, should use clang)" false)
-
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wfatal-errors -std=c++14")
 
 ## Generate dynamic reconfigure parameters in the 'cfg' folder
@@ -74,11 +72,11 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/examples/exampleDir.h.in ${CMAKE_CURR
 add_executable(QuadrotorNLOC examples/Quadrotor/QuadrotorNLOC.cpp)
 target_link_libraries(QuadrotorNLOC ${catkin_LIBRARIES} ct_models)
     
-if(BUILD_HYQ_FULL)
+#if(BUILD_HYQ_FULL)
     add_executable(HyQNLOCContactModel examples/HyQ/HyQNLOCContactModel.cpp)
     target_link_libraries(HyQNLOCContactModel ${catkin_LIBRARIES} ct_models)
     add_dependencies(HyQNLOCContactModel ${PROJECT_NAME}_gencfg)
-endif(BUILD_HYQ_FULL)
+#endif(BUILD_HYQ_FULL)
     
 #add_executable(HyQSimulator examples/HyQ/HyQSimulator.cpp)
 #target_link_libraries(HyQSimulator ${catkin_LIBRARIES})

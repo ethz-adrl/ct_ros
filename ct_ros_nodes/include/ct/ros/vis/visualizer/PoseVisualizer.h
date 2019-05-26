@@ -41,7 +41,7 @@ public:
     {
         points_.clear();
         quaternions_.clear();
-        addPose(pose.position().toImplementation(), pose.getRotationQuaternion().toImplementation());
+        addPose(pose.position(), pose.getRotationQuaternion());
     }
 
     void setPoses(const point_list_t& points, const quaternion_list_t& quats)

@@ -1,6 +1,5 @@
 /**********************************************************************************************************************
 This file is part of the Control Toolbox (https://github.com/ethz-adrl/control-toolbox), copyright by ETH Zurich.
-Authors:  Michael Neunert, Markus Giftthaler, Markus Stäuble, Diego Pardo, Farbod Farshidian
 Licensed under BSD-2 license (see LICENSE file in main directory)
 **********************************************************************************************************************/
 
@@ -100,8 +99,8 @@ public:
         : TermTaskspaceHyAMobile(eeInd,
               Qpos,
               Qrot,
-              rbdPose.position().toImplementation(),
-              rbdPose.getRotationQuaternion().toImplementation(),
+              rbdPose.position(),
+              rbdPose.getRotationQuaternion(),
               name,
               evalControlDerivatives)
     {
@@ -136,8 +135,9 @@ public:
     void setup()
     {
         // map term evaluation function to AD function
-        costFun_ = [&](
-            const Eigen::Matrix<SCALAR, AD_PARAMETER_DIM, 1>& inputParams) { return evalLocal<SCALAR>(inputParams); };
+        costFun_ = [&](const Eigen::Matrix<SCALAR, AD_PARAMETER_DIM, 1>& inputParams) {
+            return evalLocal<SCALAR>(inputParams);
+        };
 
         // set up derivatives
         derivativesCppadJIT_ =
@@ -377,7 +377,7 @@ private:
 
         // position difference in world frame
         Eigen::Matrix<SC, 3, 1> xCurr =
-            kinematics_.getEEPositionInWorld(eeInd_, rbdState.basePose(), rbdState.jointPositions()).toImplementation();
+            kinematics_.getEEPositionInWorld(eeInd_, rbdState.basePose(), rbdState.jointPositions());
         Eigen::Matrix<SC, 3, 1> xDiff = xCurr - w_p_ref;
 
         // compute the cost from the position error

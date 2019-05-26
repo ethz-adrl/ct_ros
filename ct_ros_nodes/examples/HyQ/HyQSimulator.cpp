@@ -48,10 +48,8 @@ bool useProjectedDynamics = false;
 
 void callback(ct_ros_nodes::SimulationConfig &config, uint32_t level) {
 
-	initRbdState.basePose().position().toImplementation() << config.x_init, config.y_init, config.z_init;
-
-	kindr::EulerAnglesXyzD eulerAngles(config.roll, config.pitch, config.yaw);
-	initRbdState.basePose().setFromEulerAnglesXyz(eulerAngles);
+	initRbdState.basePose().position() << config.x_init, config.y_init, config.z_init;
+	initRbdState.basePose().setFromEulerAnglesXyz(config.roll, config.pitch, config.yaw);
 
 	if(config.reset)
 	{

@@ -1,6 +1,5 @@
 /**********************************************************************************************************************
 This file is part of the Control Toolbox (https://github.com/ethz-adrl/control-toolbox), copyright by ETH Zurich.
-Authors:  Michael Neunert, Markus Giftthaler, Markus Stäuble, Diego Pardo, Farbod Farshidian
 Licensed under BSD-2 license (see LICENSE file in main directory)
 **********************************************************************************************************************/
 
@@ -62,16 +61,16 @@ void visualizeTrajectory(ct::ros::RBDStatePublisher& publisher,
 
         // publish base pose message
         Eigen::Vector3d base_position_world(x[i](0), x[i](1), 0.0);
-        Eigen::Quaterniond base_orient = stateBase.base().pose().getRotationQuaternion().toImplementation();
+        Eigen::Quaterniond base_orient = stateBase.base().pose().getRotationQuaternion();
         basePoseVisualizer->setPose(base_position_world, base_orient);
 
         // publish end effector pose message
         size_t eeInd = 0;
-        kindr::Position<double, 3> eePosCurr =
+        Eigen::Vector3d eePosCurr =
             kinematics.getEEPositionInWorld(eeInd, stateBase.base().pose(), x[i].template cast<double>().tail<6>());
         Eigen::Quaterniond quatCurr(
             kinematics.getEERotInWorld(eeInd, stateBase.base().pose(), x[i].template cast<double>().tail<6>()));
-        eePoseVisualizer->setPose(eePosCurr.toImplementation(), quatCurr);
+        eePoseVisualizer->setPose(eePosCurr, quatCurr);
 
         eePoseVisNode.visualize();
         basePoseVisNode.visualize();
