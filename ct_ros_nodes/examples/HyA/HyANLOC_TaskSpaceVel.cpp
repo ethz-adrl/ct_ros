@@ -192,35 +192,42 @@ int main(int argc, char* argv[])
     ROS_INFO("Setting up joint-space constraints");
 
     // create constraint container
-    std::shared_ptr<ct::optcon::ConstraintContainerAnalytical<state_dim, control_dim>> constraints(
+    std::shared_ptr<ct::optcon::ConstraintContainerAnalytical<state_dim, control_dim>> inputBoxConstraints(
+        new ct::optcon::ConstraintContainerAnalytical<state_dim, control_dim>());
+
+    std::shared_ptr<ct::optcon::ConstraintContainerAnalytical<state_dim, control_dim>> stateBoxConstraints(
         new ct::optcon::ConstraintContainerAnalytical<state_dim, control_dim>());
 
     // constraint bounds
     ct::core::ControlVector<control_dim> u_lb = -100 * ct::core::ControlVector<control_dim>::Ones();
     ct::core::ControlVector<control_dim> u_ub = 100 * ct::core::ControlVector<control_dim>::Ones();
-    ct::core::StateVector<state_dim> x_lb = -3.14 * ct::core::StateVector<state_dim>::Ones();
-    ct::core::StateVector<state_dim> x_ub = 3.14 * ct::core::StateVector<state_dim>::Ones();
-
-    // constrain terms
+        // input constraint terms
     std::shared_ptr<ct::optcon::ControlInputConstraint<state_dim, control_dim>> controlConstraint(
         new ct::optcon::ControlInputConstraint<state_dim, control_dim>(u_lb, u_ub));
     controlConstraint->setName("ControlInputConstraint");
+        // add and initialize constraint terms
+    inputBoxConstraints->addIntermediateConstraint(controlConstraint, true);
+    inputBoxConstraints->initialize();
+    
+    
+    ct::core::StateVector<state_dim> x_lb = -3.14 * ct::core::StateVector<state_dim>::Ones();
+    ct::core::StateVector<state_dim> x_ub = 3.14 * ct::core::StateVector<state_dim>::Ones();
+
+    // state constraint terms
     std::shared_ptr<ct::optcon::StateConstraint<state_dim, control_dim>> stateConstraint(
         new ct::optcon::StateConstraint<state_dim, control_dim>(x_lb, x_ub));
     stateConstraint->setName("StateConstraint");
-
-    // add and initialize constraint terms
-    constraints->addIntermediateConstraint(controlConstraint, true);
-    constraints->addIntermediateConstraint(stateConstraint, true);
-    constraints->addTerminalConstraint(stateConstraint,true);
-    constraints->initialize();
+    // add and initialize constraint terms    
+    stateBoxConstraints->addIntermediateConstraint(stateConstraint, true);
+    stateBoxConstraints->addTerminalConstraint(stateConstraint,true);
+    stateBoxConstraints->initialize();
 
 
     ROS_INFO("Creating optcon problem now");
     ct::optcon::ContinuousOptConProblem<state_dim, control_dim> optConProblem(tf, x0, system, costFun, linSystem);
     // add the box constraints to the optimal control problem
-    optConProblem.setBoxConstraints(constraints);
-
+    optConProblem.setInputBoxConstraints(inputBoxConstraints);
+    optConProblem.setStateBoxConstraints(stateBoxConstraints);
 
     ROS_INFO("Creating solver now");
     NLOptConSolver nloc(optConProblem, nloc_settings);

@@ -133,35 +133,42 @@ int main(int argc, char* argv[])
     // constraint terms
     ROS_INFO("Setting up joint-space constraints");
 
-    // create constraint container
-    std::shared_ptr<ct::optcon::ConstraintContainerAnalytical<state_dim, control_dim>> boxConstraints(
+  // create constraint container
+    std::shared_ptr<ct::optcon::ConstraintContainerAnalytical<state_dim, control_dim>> inputBoxConstraints(
         new ct::optcon::ConstraintContainerAnalytical<state_dim, control_dim>());
 
-    // constraint bounds
-    ct::core::ControlVector<control_dim> u_lb = -1000 * ct::core::ControlVector<control_dim>::Ones();
-    ct::core::ControlVector<control_dim> u_ub = 1000 * ct::core::ControlVector<control_dim>::Ones();
+    std::shared_ptr<ct::optcon::ConstraintContainerAnalytical<state_dim, control_dim>> stateBoxConstraints(
+        new ct::optcon::ConstraintContainerAnalytical<state_dim, control_dim>());
+
+    // input constraint bounds
+    ct::core::ControlVector<control_dim> u_lb = -100 * ct::core::ControlVector<control_dim>::Ones();
+    ct::core::ControlVector<control_dim> u_ub = 100 * ct::core::ControlVector<control_dim>::Ones();
+    // input constraint terms
+    std::shared_ptr<ct::optcon::ControlInputConstraint<state_dim, control_dim>> controlConstraint(
+        new ct::optcon::ControlInputConstraint<state_dim, control_dim>(u_lb, u_ub));
+    controlConstraint->setName("ControlInputConstraint");
+        // add and initialize constraint terms
+    inputBoxConstraints->addIntermediateConstraint(controlConstraint, true);
+    inputBoxConstraints->initialize();
+    
+    // state constraint bounds
     ct::core::StateVector<state_dim> x_lb, x_ub;
     x_lb.head<njoints>() = -3.14 * Eigen::Matrix<double, njoints, 1>::Ones(); // lower bound on position
     x_ub.head<njoints>() =  3.14 * Eigen::Matrix<double, njoints, 1>::Ones(); // upper bound on position
     x_lb.tail<njoints>() = -100 * Eigen::Matrix<double, njoints, 1>::Ones(); // lower bound on velocity
     x_ub.tail<njoints>() =  100 * Eigen::Matrix<double, njoints, 1>::Ones(); // upper bound on velocity
-
-    // constrain terms
-    std::shared_ptr<ct::optcon::ControlInputConstraint<state_dim, control_dim>> controlConstraint(
-        new ct::optcon::ControlInputConstraint<state_dim, control_dim>(u_lb, u_ub));
-    controlConstraint->setName("ControlInputConstraint");
+    // state constraint terms
     std::shared_ptr<ct::optcon::StateConstraint<state_dim, control_dim>> stateConstraint(
         new ct::optcon::StateConstraint<state_dim, control_dim>(x_lb, x_ub));
     stateConstraint->setName("StateConstraint");
+    // add and initialize constraint terms    
+    stateBoxConstraints->addIntermediateConstraint(stateConstraint, true);
+    stateBoxConstraints->addTerminalConstraint(stateConstraint,true);
+    stateBoxConstraints->initialize();
 
-    // add and initialize constraint terms
-    boxConstraints->addIntermediateConstraint(controlConstraint, true);
-    boxConstraints->addIntermediateConstraint(stateConstraint, true);
-    boxConstraints->addTerminalConstraint(stateConstraint,true);
-    boxConstraints->initialize();
 
     ROS_INFO("Creating solvers now");
-    FixBaseNLOC<HyASystem> nloc(costFun, boxConstraints, nullptr, nloc_settings, system, true, linSystem);
+    FixBaseNLOC<HyASystem> nloc(costFun, inputBoxConstraints, stateBoxConstraints, nullptr, nloc_settings, system, true, linSystem);
 
     ct::core::Time timeHorizon;
     ct::core::loadScalar(configFile, "timeHorizon", timeHorizon);

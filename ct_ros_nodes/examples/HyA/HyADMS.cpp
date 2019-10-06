@@ -163,12 +163,12 @@ int main(int argc, char* argv[])
     ct::optcon::ContinuousOptConProblem<HyASystemD::STATE_DIM, HyASystemD::CONTROL_DIM> optProblem(systemD, costFunction, linSystemD);
     optProblem.setInitialState(x0D.toImplementation());
     optProblem.setTimeHorizon(settings.T_);
-    optProblem.setBoxConstraints(pureStateConstraints);
+    optProblem.setStateBoxConstraints(pureStateConstraints);
 
     // ct::optcon::ContinuousOptConProblem<HyASystemD::STATE_DIM, HyASystemD::CONTROL_DIM, ct::core::ADCGScalar> optProblemCG(systemCG, costFunctionCG);
     // optProblemCG.setInitialState(x0D.toImplementation().template cast<ct::core::ADCGScalar>());
     // optProblemCG.setTimeHorizon(ct::core::ADCGScalar(settings.T_));
-    // optProblemCG.setBoxConstraints(pureStateConstraintsCG);    
+    // optProblemCG.setStateBoxConstraints(pureStateConstraintsCG);    
 
     std::shared_ptr<ct::optcon::DmsSolver<HyASystemD::STATE_DIM, HyASystemD::CONTROL_DIM>> dmsPlanner(
         new ct::optcon::DmsSolver<HyASystemD::STATE_DIM, HyASystemD::CONTROL_DIM>(optProblem, settings));
