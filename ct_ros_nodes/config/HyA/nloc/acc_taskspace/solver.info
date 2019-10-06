@@ -20,8 +20,8 @@ nloc
     maxDefectSum 1e-4
     nThreads 1
     nThreadsEigen 1
-    locp_solver HPIPM_SOLVER
-    ;locp_solver GNRICCATI_SOLVER
+    ;locp_solver HPIPM_SOLVER
+    locp_solver GNRICCATI_SOLVER
     nlocp_algorithm ILQR
     closedLoopShooting true
     printSummary true

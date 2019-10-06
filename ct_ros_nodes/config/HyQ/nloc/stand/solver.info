@@ -8,7 +8,7 @@ alg
 	K_sim 1
 	K_shot 1
     epsilon 1e-6
-	max_iterations 5
+	max_iterations 50
     fixedHessianCorrection false
     recordSmallestEigenvalue false
     min_cost_improvement 1e-10
@@ -16,7 +16,7 @@ alg
     closedLoopShooting true
     nThreads 1
     nThreadsEigen 1
-    locp_solver HPIPM_SOLVER ; GNRICCATI_SOLVER
+    locp_solver GNRICCATI_SOLVER
     nlocp_algorithm ILQR
     loggingPrefix ""
     printSummary true
