@@ -21,7 +21,6 @@ nloc
     nThreadsEigen 1
     locp_solver GNRICCATI_SOLVER
     nlocp_algorithm GNMS
-    closedLoopShooting true
     loggingPrefix "~/packages/ct_ros/ct_ros_nodes/examples/HyA/matlab/ILQR" 
     printSummary false
     debugPrint false

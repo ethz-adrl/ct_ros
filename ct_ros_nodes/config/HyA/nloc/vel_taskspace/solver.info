@@ -23,7 +23,6 @@ nloc
     locp_solver HPIPM_SOLVER
     ;locp_solver GNRICCATI_SOLVER
     nlocp_algorithm ILQR
-    closedLoopShooting true
     printSummary true
     debugPrint false
     logToMatlab false

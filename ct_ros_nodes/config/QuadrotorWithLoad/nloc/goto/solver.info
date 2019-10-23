@@ -20,7 +20,6 @@ nloc
     nThreadsEigen 1
     locp_solver GNRICCATI_SOLVER
     nlocp_algorithm GNMS
-    closedLoopShooting true
     printSummary true
     debugPrint false
     logToMatlab false
