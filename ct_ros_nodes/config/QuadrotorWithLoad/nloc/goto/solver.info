@@ -27,7 +27,7 @@ nloc
   
     line_search
 	{
-		active false ;
+		type NONE ;
 		adaptive false ;
 		maxIterations 10 ;
 		alpha_0 1.0 ;

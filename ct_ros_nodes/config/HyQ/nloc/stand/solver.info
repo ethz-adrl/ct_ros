@@ -23,7 +23,7 @@ alg
     
     line_search
 	{
-		active true ;
+		type SIMPLE ;
 		adaptive false ;
 		maxIterations 10 ;
 		alpha_0 1.0 ;
