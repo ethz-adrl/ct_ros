@@ -21,16 +21,14 @@ using SystemLinearizer = ct::core::SystemLinearizer<state_dim, control_dim>;
 using StateVector = ct::core::StateVector<njoints>;
 using NLOptConSolver = ct::optcon::NLOptConSolver<state_dim, control_dim>;
 
-using HyAKinematicsAD_t = HyA::tpl::Kinematics<ct::core::ADCGScalar>;
 using HyAKinematics_t = HyA::tpl::Kinematics<double>;
 
-using IKProblem = ct::rbd::IKNLP<HyAKinematicsAD_t>;
+using IKProblem = ct::rbd::IKNLP<HyAKinematics_t>;
 using IKNLPSolver = ct::rbd::IKNLPSolverIpopt<IKProblem, HyAKinematics_t>;
 
 StateVector x0;  // init state
 
 size_t eeInd = 0;
-
 
 
 int main(int argc, char* argv[])
@@ -64,8 +62,8 @@ int main(int argc, char* argv[])
     ct::rbd::JointState<njoints>::Position jointUpperLimit = ct::models::HyA::jointUpperLimit();
 
 
-    std::shared_ptr<ct::rbd::IKCostEvaluator<HyAKinematicsAD_t>> ikCostEvaluator(
-        new ct::rbd::IKCostEvaluator<HyAKinematicsAD_t>(costFunctionFile, "termTaskSpace", true));
+    std::shared_ptr<ct::rbd::IKCostEvaluator<HyAKinematics_t>> ikCostEvaluator(
+        new ct::rbd::IKCostEvaluator<HyAKinematics_t>(costFunctionFile, "termTaskSpace", true));
 
     // set up inverse kinematics problem
     std::shared_ptr<IKProblem> ik_problem(new IKProblem(ikCostEvaluator, jointLowerLimit, jointUpperLimit));
@@ -89,8 +87,8 @@ int main(int argc, char* argv[])
     IKNLPSolver::JointPositionsVector_t solutions;
     bool accurateSolutionFound = ikSolver.computeInverseKinematics(solutions, ee_pose_des);
 
-    if(!accurateSolutionFound)
-    	ROS_ERROR("The Solution found by IK is inaccurate!");
+    if (!accurateSolutionFound)
+        ROS_ERROR("The Solution found by IK is inaccurate!");
 
     // there is only one solution
     ct::rbd::JointState<njoints>::Position sol = solutions.front();
@@ -98,7 +96,7 @@ int main(int argc, char* argv[])
 
     do
     {
-      std::cout << '\n' << "Press a key to continue...";
+        std::cout << '\n' << "Press a key to continue...";
     } while (std::cin.get() != '\n');
 
     ct::rbd::HyA::Kinematics kinematics;
@@ -111,7 +109,8 @@ int main(int argc, char* argv[])
         targetPoseVisualizer->setPose(ee_pose_des);
         visNode_poseDes.visualize();
 
-        ct::rbd::RigidBodyPose eePoseCurr = kinematics.getEEPoseInBase(eeInd,sol.template cast<double>().head<njoints>());
+        ct::rbd::RigidBodyPose eePoseCurr =
+            kinematics.getEEPoseInBase(eeInd, sol.template cast<double>().head<njoints>());
         currentPoseVisualizer->setPose(eePoseCurr);
         visNode_poseCurr.visualize();
 
