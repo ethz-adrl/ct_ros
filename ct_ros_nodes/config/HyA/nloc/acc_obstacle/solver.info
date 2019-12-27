@@ -22,7 +22,7 @@ nloc
     nThreadsEigen 1
     locp_solver HPIPM_SOLVER
     ;locp_solver GNRICCATI_SOLVER
-    nlocp_algorithm ILQR
+    nlocp_algorithm GNMS
     printSummary true
     debugPrint false
     logToMatlab false

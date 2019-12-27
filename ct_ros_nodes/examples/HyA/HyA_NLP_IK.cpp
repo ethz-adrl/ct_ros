@@ -72,7 +72,7 @@ int main(int argc, char* argv[])
     ct::optcon::NlpSolverSettings nlpSolverSettings;
     nlpSolverSettings.solverType_ = ct::optcon::NlpSolverType::IPOPT;
     nlpSolverSettings.ipoptSettings_.derivativeTest_ = "first-order";
-    nlpSolverSettings.ipoptSettings_.hessian_approximation_ = "limited-memory";
+    nlpSolverSettings.ipoptSettings_.hessian_approximation_ = "exact";
     nlpSolverSettings.ipoptSettings_.max_iter_ = 200;
     nlpSolverSettings.ipoptSettings_.tol_ = 1e-8;
 

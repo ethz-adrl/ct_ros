@@ -1,14 +1,12 @@
 timeHorizon 3.0
 
-initType    0 ; 0 = steady state ID, 1 = linear
-
 nloc
 {
 	integrator Euler
 	useSensitivityIntegrator false
 	discretization Forward_euler
 	timeVaryingDiscretization false   
-	dt 0.05
+	dt 0.01
     K_sim 1
     K_shot 1
     epsilon 1e-6
@@ -20,7 +18,6 @@ nloc
     maxDefectSum 1e-4
     nThreads 1
     nThreadsEigen 1
-    ;locp_solver HPIPM_SOLVER
     locp_solver GNRICCATI_SOLVER
     nlocp_algorithm ILQR
     printSummary true

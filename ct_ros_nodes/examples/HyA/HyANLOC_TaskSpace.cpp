@@ -14,8 +14,6 @@ Licensed under BSD-2 license (see LICENSE file in main directory)
 #include <ct/models/HyA/HyA.h>
 #include <ct/models/HyA/HyAInverseKinematics.h>
 
-#include "EERegularizationTerm.hpp"
-
 using namespace ct::rbd;
 
 const size_t njoints = ct::rbd::HyA::Kinematics::NJOINTS;
@@ -30,7 +28,6 @@ using LinearSystem = ct::core::LinearSystem<state_dim, control_dim>;
 using HyALinearCodegen = ct::models::HyA::HyALinearizedForward;
 
 RobotState_t x0;  // init state
-
 
 
 int main(int argc, char* argv[])
@@ -68,7 +65,7 @@ int main(int argc, char* argv[])
 
     ROS_INFO("Initializing NLOC");
 
-    // load x0 and xf
+    // load x0
     RobotState_t::state_vector_t x0_load;
     ct::core::loadMatrix(costFunctionFile, "x_0", x0_load);
     x0.fromStateVector(x0_load);
@@ -86,38 +83,18 @@ int main(int argc, char* argv[])
         new ct::optcon::CostFunctionAnalytical<state_dim, control_dim>());
 
     ROS_INFO("Setting up task-space cost term");
-    using HyAKinematicsAD_t = HyA::tpl::Kinematics<ct::core::ADCGScalar>;
     using HyAKinematics_t = HyA::tpl::Kinematics<double>;
 
 
     // task space cost term
-    using TermTaskspacePoseCG = ct::rbd::TermTaskspacePoseCG<HyAKinematicsAD_t, false, state_dim, control_dim>;
-    std::shared_ptr<TermTaskspacePoseCG> termTaskSpace_final(
-        new TermTaskspacePoseCG(costFunctionFile, "termTaskSpace_final", true));
+    using TermTaskspacePose = ct::rbd::TermTaskspaceGeometricJacobian<HyAKinematics_t, state_dim, control_dim>;
+    std::shared_ptr<TermTaskspacePose> termTaskSpace_final(
+        new TermTaskspacePose(costFunctionFile, "termTaskSpace_final", true));
     size_t task_space_term_id = costFun->addFinalTerm(termTaskSpace_final, true);
-
-
-    // task-space regularization term
-//    using EERegularizationTerm = ct::optcon::EERegularizationTerm<12, 6, HyAKinematics_t>;
-//    std::shared_ptr<EERegularizationTerm> termTaskSpace_reg(new EERegularizationTerm(costFunctionFile, "termTaskSpace_reg", true));
-//    size_t reg_term_id = costFun->addFinalTerm(termTaskSpace_reg, true);
 
 
     ROS_INFO("Solving Inverse Kinematics for Initial Guess");
     ct::rbd::RigidBodyPose ee_pose_des = termTaskSpace_final->getReferencePose();
-    // try to compute an IK solution
-    ct::rbd::HyAInverseKinematics<double> hya_ik_solver;
-    RobotState_t xf;  // temporary final state
-    xf.setZero();
-
-    ct::rbd::JointState<6>::Position ikSolution;
-    if (!hya_ik_solver.computeInverseKinematicsCloseTo(ikSolution, ee_pose_des, x0.joints().getPositions()))
-    {
-        ROS_INFO("Could not find IK solution for this target pose. Exiting.");
-        return 0;
-    }
-
-    xf.joints().getPositions() = ikSolution;
 
     ROS_INFO("Setting up joint-space cost terms");
     using TermQuadratic = ct::optcon::TermQuadratic<state_dim, control_dim>;
@@ -133,7 +110,7 @@ int main(int argc, char* argv[])
     // constraint terms
     ROS_INFO("Setting up joint-space constraints");
 
-  // create constraint container
+    // create constraint container
     std::shared_ptr<ct::optcon::ConstraintContainerAnalytical<state_dim, control_dim>> inputBoxConstraints(
         new ct::optcon::ConstraintContainerAnalytical<state_dim, control_dim>());
 
@@ -141,86 +118,59 @@ int main(int argc, char* argv[])
         new ct::optcon::ConstraintContainerAnalytical<state_dim, control_dim>());
 
     // input constraint bounds
-    ct::core::ControlVector<control_dim> u_lb = -100 * ct::core::ControlVector<control_dim>::Ones();
-    ct::core::ControlVector<control_dim> u_ub = 100 * ct::core::ControlVector<control_dim>::Ones();
+    ct::core::ControlVector<control_dim> u_lb = -50 * ct::core::ControlVector<control_dim>::Ones();
+    ct::core::ControlVector<control_dim> u_ub = 50 * ct::core::ControlVector<control_dim>::Ones();
     // input constraint terms
     std::shared_ptr<ct::optcon::ControlInputConstraint<state_dim, control_dim>> controlConstraint(
         new ct::optcon::ControlInputConstraint<state_dim, control_dim>(u_lb, u_ub));
     controlConstraint->setName("ControlInputConstraint");
-        // add and initialize constraint terms
+    // add and initialize constraint terms
     inputBoxConstraints->addIntermediateConstraint(controlConstraint, true);
     inputBoxConstraints->initialize();
-    
+
+
     // state constraint bounds
     ct::core::StateVector<state_dim> x_lb, x_ub;
-    x_lb.head<njoints>() = -3.14 * Eigen::Matrix<double, njoints, 1>::Ones(); // lower bound on position
-    x_ub.head<njoints>() =  3.14 * Eigen::Matrix<double, njoints, 1>::Ones(); // upper bound on position
-    x_lb.tail<njoints>() = -100 * Eigen::Matrix<double, njoints, 1>::Ones(); // lower bound on velocity
-    x_ub.tail<njoints>() =  100 * Eigen::Matrix<double, njoints, 1>::Ones(); // upper bound on velocity
+    x_lb.head<njoints>() = -3.14 * Eigen::Matrix<double, njoints, 1>::Ones();  // lower bound on position
+    x_ub.head<njoints>() = 3.14 * Eigen::Matrix<double, njoints, 1>::Ones();   // upper bound on position
+    x_lb.tail<njoints>() = -2 * Eigen::Matrix<double, njoints, 1>::Ones();     // lower bound on velocity
+    x_ub.tail<njoints>() = 2 * Eigen::Matrix<double, njoints, 1>::Ones();      // upper bound on velocity
     // state constraint terms
     std::shared_ptr<ct::optcon::StateConstraint<state_dim, control_dim>> stateConstraint(
         new ct::optcon::StateConstraint<state_dim, control_dim>(x_lb, x_ub));
     stateConstraint->setName("StateConstraint");
-    // add and initialize constraint terms    
+    // add and initialize constraint terms
     stateBoxConstraints->addIntermediateConstraint(stateConstraint, true);
-    stateBoxConstraints->addTerminalConstraint(stateConstraint,true);
+    stateBoxConstraints->addTerminalConstraint(stateConstraint, true);
     stateBoxConstraints->initialize();
 
 
     ROS_INFO("Creating solvers now");
-    FixBaseNLOC<HyASystem> nloc(costFun, inputBoxConstraints, stateBoxConstraints, nullptr, nloc_settings, system, true, linSystem);
+    FixBaseNLOC<HyASystem> nloc(
+        costFun, inputBoxConstraints, stateBoxConstraints, nullptr, nloc_settings, system, true, linSystem);
+    ROS_INFO("Finished creating solvers.");
 
     ct::core::Time timeHorizon;
     ct::core::loadScalar(configFile, "timeHorizon", timeHorizon);
 
     int K = nloc.getSettings().computeK(timeHorizon);
 
-    int initType = 0;
-    ct::core::loadScalar(configFile, "initType", initType);
 
-    switch (initType)
+    // init
+    ct::core::ControlVector<HyASystem::CONTROL_DIM> uff_ref;
+    nloc.initializeSteadyPose(x0, timeHorizon, K, uff_ref, -fbD);
+
+    std::vector<std::shared_ptr<ct::optcon::CostFunctionQuadratic<state_dim, control_dim>>>& inst1 =
+        nloc.getSolver()->getCostFunctionInstances();
+
+    ROS_INFO("Starting to update cost function instances");
+    for (size_t i = 0; i < inst1.size(); i++)
     {
-        case 0:  // steady state
-        {
-            ct::core::ControlVector<HyASystem::CONTROL_DIM> uff_ref;
-            nloc.initializeSteadyPose(x0, timeHorizon, K, uff_ref, -fbD);
-            std::cout << "Reference torque was: " << uff_ref.transpose() << std::endl;
-
-            std::vector<std::shared_ptr<ct::optcon::CostFunctionQuadratic<2 * njoints, njoints>>>& inst1 =
-                nloc.getSolver()->getCostFunctionInstances();
-
-            for (size_t i = 0; i < inst1.size(); i++)
-            {
-                inst1[i]->getIntermediateTermById(intTermID)->updateReferenceControl(uff_ref);
-                inst1[i]->getIntermediateTermById(intTermID)->updateReferenceState(x0.toStateVector());
-                inst1[i]->getFinalTermById(term_quad_final_id)->updateReferenceState(x0.toStateVector());
-            }
-
-            break;
-        }
-        case 1:  // linear interpolation
-        {
-            ct::core::ControlVectorArray<njoints> uff_array;
-            ct::core::StateVectorArray<2 * njoints> x_array;
-            nloc.initializeDirectInterpolation(x0, xf, timeHorizon, K, uff_array, x_array, -fbD);
-
-            std::vector<std::shared_ptr<ct::optcon::CostFunctionQuadratic<2 * njoints, njoints>>>& inst1 =
-                            nloc.getSolver()->getCostFunctionInstances();
-
-		for (size_t i = 0; i < inst1.size(); i++) {
-			inst1[i]->getIntermediateTermById(intTermID)->updateReferenceControl(
-					uff_array.front());
-//                            inst1[i]->getIntermediateTermById(intTermID)->updateReferenceState(x0.toStateVector());
-//                            inst1[i]->getFinalTermById(term_quad_final_id)->updateReferenceState(x0.toStateVector());
-		}
-            break;
-        }
-        default:
-        {
-            throw std::runtime_error("illegal init type");
-            break;
-        }
+        inst1[i]->getIntermediateTermById(intTermID)->updateReferenceControl(uff_ref);
+        inst1[i]->getIntermediateTermById(intTermID)->updateReferenceState(x0.toStateVector());
+        inst1[i]->getFinalTermById(term_quad_final_id)->updateReferenceState(x0.toStateVector());
     }
+
 
     ROS_INFO("Solving problem ...");
 
@@ -231,7 +181,7 @@ int main(int argc, char* argv[])
 
     do
     {
-      std::cout << '\n' << "Press a key to continue...";
+        std::cout << '\n' << "Press a key to continue...";
     } while (std::cin.get() != '\n');
 
     while (ros::ok())
