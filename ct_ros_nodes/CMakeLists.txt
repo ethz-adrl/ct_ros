@@ -85,12 +85,14 @@ target_link_libraries(HyANLOC ${catkin_LIBRARIES} ct_models)
 
 add_executable(HyANLOC_TaskSpace examples/HyA/HyANLOC_TaskSpace.cpp)
 target_link_libraries(HyANLOC_TaskSpace ${catkin_LIBRARIES} ct_ros_visualization ct_models)
- 
+
 add_executable(HyANLOC_TaskSpaceAcc examples/HyA/HyANLOC_TaskSpaceAcc.cpp)
 target_link_libraries(HyANLOC_TaskSpaceAcc ${catkin_LIBRARIES} ct_ros_visualization ct_models)
 
-add_executable(HyANLOC_ObstacleAcc examples/HyA/HyANLOC_ObstacleAcc.cpp)
-target_link_libraries(HyANLOC_ObstacleAcc ${catkin_LIBRARIES} ct_ros_visualization ct_models)
+if(CPPADCG)
+  add_executable(HyANLOC_ObstacleAcc examples/HyA/HyANLOC_ObstacleAcc.cpp)
+  target_link_libraries(HyANLOC_ObstacleAcc ${catkin_LIBRARIES} ct_ros_visualization ct_models)
+endif()
 
 add_executable(HyA_NLP_IK examples/HyA/HyA_NLP_IK.cpp) 
 target_link_libraries(HyA_NLP_IK ${catkin_LIBRARIES} ct_ros_visualization ct_models)

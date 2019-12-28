@@ -1,9 +1,3 @@
-/*
- * HyASLQ.cpp
- *
- *  Created on: Feb 8, 2017
- *      Author: markusta
- */
 
 #include <ct/optcon/optcon.h>
 #include <ct/rbd/rbd.h>
@@ -17,11 +11,11 @@ using namespace ct::rbd;
 const size_t njoints = ct::rbd::HyA::Kinematics::NJOINTS;
 
 typedef ct::rbd::HyA::tpl::Dynamics<double> HyADynamicsD;
-typedef ct::rbd::HyA::tpl::Dynamics<ct::core::ADCGScalar> HyADynamicsCG;
+//typedef ct::rbd::HyA::tpl::Dynamics<ct::core::ADCGScalar> HyADynamicsCG;
 // typedef ct::rbd::HyA::tpl::Dynamics<float> HyADynamicsF;
 
 typedef ct::rbd::FixBaseFDSystem<HyADynamicsD, false> HyASystemD;
-typedef ct::rbd::FixBaseFDSystem<HyADynamicsCG, false> HyASystemCG;
+//typedef ct::rbd::FixBaseFDSystem<HyADynamicsCG, false> HyASystemCG;
 // typedef ct::rbd::FixBaseFDSystem<HyADynamicsF, false> HyASystemF;
 typedef ct::models::HyA::HyALinearizedForward CodegenLinModelD;
 typedef ct::models::HyA::HyALinearizedForward CodegenLinModelCG;
@@ -32,8 +26,7 @@ typedef ct::core::LinearSystem<HyASystemD::STATE_DIM, HyASystemD::CONTROL_DIM, d
 // typedef ct::core::LinearSystem<HyASystemF::STATE_DIM, HyASystemF::CONTROL_DIM, float> LinearSystemF;
 //
 typedef ct::optcon::CostFunctionAnalytical<HyASystemD::STATE_DIM, HyASystemD::CONTROL_DIM, double> CostFunctionD;
-typedef ct::optcon::CostFunctionAnalytical<HyASystemD::STATE_DIM, HyASystemD::CONTROL_DIM, ct::core::ADCGScalar>
-    CostFunctionCG;
+//typedef ct::optcon::CostFunctionAnalytical<HyASystemD::STATE_DIM, HyASystemD::CONTROL_DIM, ct::core::ADCGScalar> CostFunctionCG;
 
 JointState<njoints, double> x0D;
 JointState<njoints, double> xFD;
@@ -117,7 +110,7 @@ int main(int argc, char* argv[])
 
         ROS_INFO("Setting up system");
         std::shared_ptr<HyASystemD> systemD(new HyASystemD);
-        std::shared_ptr<HyASystemCG> systemCG(new HyASystemCG);
+        //std::shared_ptr<HyASystemCG> systemCG(new HyASystemCG);
 
         std::shared_ptr<LinearSystemD> linSystemD = nullptr;
         // std::shared_ptr<LinearSystemCG> linSystemCG(new CodegenLinModelCG);
@@ -152,24 +145,24 @@ int main(int argc, char* argv[])
             pureStateConstraints(
                 new ct::optcon::ConstraintContainerAnalytical<HyASystemD::STATE_DIM, HyASystemD::CONTROL_DIM>());
 
-        std::shared_ptr<ct::optcon::ConstraintContainerAnalytical<HyASystemD::STATE_DIM, HyASystemD::CONTROL_DIM,
-            ct::core::ADCGScalar>>
-            pureStateConstraintsCG(new ct::optcon::ConstraintContainerAnalytical<HyASystemD::STATE_DIM,
-                HyASystemD::CONTROL_DIM, ct::core::ADCGScalar>());
+        //std::shared_ptr<ct::optcon::ConstraintContainerAnalytical<HyASystemD::STATE_DIM, HyASystemD::CONTROL_DIM,
+        //    ct::core::ADCGScalar>>
+        //    pureStateConstraintsCG(new ct::optcon::ConstraintContainerAnalytical<HyASystemD::STATE_DIM,
+        //        HyASystemD::CONTROL_DIM, ct::core::ADCGScalar>());
 
         std::shared_ptr<ct::optcon::TerminalConstraint<HyASystemD::STATE_DIM, HyASystemD::CONTROL_DIM>>
             terminalConstraint(new ct::optcon::TerminalConstraint<HyASystemD::STATE_DIM, HyASystemD::CONTROL_DIM>(
                 xFD.toImplementation()));
 
-        std::shared_ptr<
-            ct::optcon::TerminalConstraint<HyASystemD::STATE_DIM, HyASystemD::CONTROL_DIM, ct::core::ADCGScalar>>
-            terminalConstraintCg(new ct::optcon::TerminalConstraint<HyASystemD::STATE_DIM, HyASystemD::CONTROL_DIM,
-                ct::core::ADCGScalar>(xFD.toImplementation().template cast<ct::core::ADCGScalar>()));
+        //std::shared_ptr<
+        //    ct::optcon::TerminalConstraint<HyASystemD::STATE_DIM, HyASystemD::CONTROL_DIM, ct::core::ADCGScalar>>
+        //    terminalConstraintCg(new ct::optcon::TerminalConstraint<HyASystemD::STATE_DIM, HyASystemD::CONTROL_DIM,
+        //        ct::core::ADCGScalar>(xFD.toImplementation().template cast<ct::core::ADCGScalar>()));
 
         terminalConstraint->setName("TerminalConstraint");
-        terminalConstraintCg->setName("TerminalConstraintCG");
+        //terminalConstraintCg->setName("TerminalConstraintCG");
         pureStateConstraints->addTerminalConstraint(terminalConstraint, true);
-        pureStateConstraintsCG->addTerminalConstraint(terminalConstraintCg, true);
+        //pureStateConstraintsCG->addTerminalConstraint(terminalConstraintCg, true);
 
         ct::optcon::ContinuousOptConProblem<HyASystemD::STATE_DIM, HyASystemD::CONTROL_DIM> optProblem(
             systemD, costFunction, linSystemD);
