@@ -28,6 +28,7 @@ dms
         MaxAssignements 3000
         Compiler CLANG
         GenerateSourceCode false
+        UseDynamicLibrary true
     }
 
     solver

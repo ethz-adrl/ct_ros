@@ -25,8 +25,6 @@ static const size_t control_dim = njoints;
 
 typedef ct::rbd::HyA::tpl::Dynamics<double> HyADynamics;
 typedef ct::rbd::FixBaseFDSystem<HyADynamics, actuator_state_dim, false> HyASystem;
-typedef ct::rbd::HyA::tpl::Dynamics<ct::core::ADCGScalar> HyADynamicsAD;
-typedef ct::rbd::FixBaseFDSystem<HyADynamicsAD, actuator_state_dim, false> HyASystemAD;
 
 typedef ct::models::HyA::HyALinearizedForward CodegenLinModel;
 typedef ct::core::LinearSystem<state_dim, control_dim, double> LinearSystem;
@@ -176,8 +174,8 @@ int main(int argc, char* argv[])
             if (visThread.joinable())
                 visThread.join();
             ROS_INFO("Visualizing");
-            visThread = std::thread(
-                visualizeTrajectory<state_dim>, std::ref(statePublisher), std::ref(x_nloc), nloc_solver.getSettings().dt);
+            visThread = std::thread(visualizeTrajectory<state_dim>, std::ref(statePublisher), std::ref(x_nloc),
+                nloc_solver.getSettings().dt);
 
 
             iterations++;
@@ -188,8 +186,8 @@ int main(int argc, char* argv[])
         if (visThread.joinable())
             visThread.join();
         ROS_INFO("Visualizing");
-        visThread =
-            std::thread(visualizeTrajectory<state_dim>, std::ref(statePublisher), std::ref(x_nloc), nloc_solver.getSettings().dt);
+        visThread = std::thread(
+            visualizeTrajectory<state_dim>, std::ref(statePublisher), std::ref(x_nloc), nloc_solver.getSettings().dt);
     }
 
     if (visThread.joinable())
@@ -221,4 +219,3 @@ void visualizeTrajectory(ct::ros::RBDStatePublisher& publisher,
 
     ros::Duration(1.0).sleep();
 }
-

@@ -15,7 +15,6 @@ alg
     recordSmallestEigenvalue false
     min_cost_improvement 1e-7
     meritFunctionRho 1000
-    closedLoopShooting true
     nThreads 1
     nThreadsEigen 1
     locp_solver GNRICCATI_SOLVER
@@ -26,7 +25,7 @@ alg
     
     line_search
 	{
-		active true ;
+		type SIMPLE ;
 		adaptive false ;
 		maxIterations 10 ;
 		alpha_0 1.0 ;

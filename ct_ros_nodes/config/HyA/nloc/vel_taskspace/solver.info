@@ -23,7 +23,6 @@ nloc
     locp_solver HPIPM_SOLVER
     ;locp_solver GNRICCATI_SOLVER
     nlocp_algorithm ILQR
-    closedLoopShooting true
     printSummary true
     debugPrint false
     logToMatlab false
@@ -31,7 +30,7 @@ nloc
     
     line_search
 	{
-		active true ;
+		type SIMPLE ;
 		adaptive false ;
 		maxIterations 10 ;
 		alpha_0 1.0 ;

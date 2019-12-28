@@ -23,7 +23,6 @@ ilqr
     ;locp_solver HPIPM_SOLVER
     locp_solver GNRICCATI_SOLVER
     nlocp_algorithm ILQR
-    closedLoopShooting true
     printSummary true
     debugPrint false
     loggingPrefix "~/packages/ct_ros/ct_ros_nodes/examples/HyA/matlab/MS_openloop_Kshot100/dummy" 
@@ -61,7 +60,6 @@ gnms
     ;locp_solver HPIPM_SOLVER
     locp_solver GNRICCATI_SOLVER
     nlocp_algorithm GNMS
-    closedLoopShooting true
     printSummary true
     debugPrint false
     loggingPrefix "~/packages/ct_ros/ct_ros_nodes/examples/HyA/matlab/MS_closedloop_Kshot100/dummy"

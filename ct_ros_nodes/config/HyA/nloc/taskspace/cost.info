@@ -73,24 +73,24 @@ term_quad_final
 		; state weighting
 		Q
 		{
-			scaling 0.0
+			scaling 1.0
 
 			; joint position              
-			(0,0)   1.0 
-			(1,1)   1.0 
-			(2,2)   1.0 
-			(3,3)   1.0 
-			(4,4)   1.0 
-			(5,5)   1.0 
+			(0,0)   0.0 
+			(1,1)   0.0 
+			(2,2)   0.0 
+			(3,3)   0.0 
+			(4,4)   0.0 
+			(5,5)   0.0 
 
 
 			; joint velocity
-			(6,6)   0.0
-			(7,7)   0.0
-			(8,8)   0.0
-			(9,9)   0.0
-			(10,10) 0.0 
-			(11,11) 0.0 
+			(6,6)   1.0
+			(7,7)   1.0
+			(8,8)   1.0
+			(9,9)   1.0
+			(10,10) 1.0 
+			(11,11) 1.0 
 		}
 
 		x_des
@@ -114,17 +114,6 @@ term_quad_final
 	}
 }
 
-termTaskSpace_reg
-{
-	name "termTaskSpace_reg"
-	type 1
-	
-	weights
-	{
-	   weight   10.0;
-	}
-}
-
 
 termTaskSpace_final
 {
@@ -136,14 +125,10 @@ termTaskSpace_final
 	{
 		eeId	0
 		
-		evalControlDerivatives 0
-		
-		Q_rot 15.0
-		
 		; desired xyz euler angles
 		eulerXyz_des
 		{
-			(0,0)  0.0
+			(0,0)  0.1
 			(1,0)  0.0
 			(2,0)  0.0
 		}
@@ -151,7 +136,16 @@ termTaskSpace_final
 		; state weighting
 		Q_pos
 		{
-			scaling 50.0
+			scaling 500.0
+
+			; position weighting          
+			(0,0)  1
+			(1,1)  1
+			(2,2)  1
+		}
+		Q_rot
+		{
+			scaling 150.0
 
 			; position weighting          
 			(0,0)  1
@@ -175,7 +169,7 @@ x_0
 {
 	; joint position              
 	(0,0)   0.2
-	(1,0)   -1.4
+	(1,0)   -1.0
 	(2,0)   0.2
 	(3,0)   0.2
 	(4,0)   0.2

@@ -13,12 +13,11 @@ Licensed under BSD-2 license (see LICENSE file in main directory)
 #include <ct/models/HyA/HyA.h>
 #include <ct/models/HyA/HyAInverseKinematics.h>
 
-#include "EERegularizationTerm.hpp"
 
 using namespace ct::rbd;
 
 const size_t njoints = ct::rbd::HyA::Kinematics::NJOINTS;
-const size_t state_dim = 2*njoints;
+const size_t state_dim = 2 * njoints;
 const size_t control_dim = njoints;
 
 using HyADynamics = ct::rbd::HyA::Dynamics;
@@ -32,10 +31,8 @@ StateVector x0;  // init state
 
 
 //! compute linearly interpolated or steady initial guess
-ct::optcon::NLOptConSolver<state_dim, control_dim>::Policy_t computeInitialGuess(int initType,
-    const size_t nSteps,
+ct::optcon::NLOptConSolver<state_dim, control_dim>::Policy_t computeInitialGuess(const size_t nSteps,
     const StateVector& x_0,
-    const StateVector& x_f,
     double dt)
 {
     // provide initial guess
@@ -44,45 +41,7 @@ ct::optcon::NLOptConSolver<state_dim, control_dim>::Policy_t computeInitialGuess
     ct::core::FeedbackArray<state_dim, control_dim> u0_fb(
         nSteps, ct::core::FeedbackMatrix<state_dim, control_dim>::Zero());
 
-    switch (initType)
-    {
-        case 0:  // steady state
-        {
-            // do nothing, that is the default initialization
-            break;
-        }
-        case 1:  // linear interpolation
-        {
-            for (size_t i = 0; i < nSteps + 1; i++)
-                x0[i] = x_0 + (x_f - x_0) * ((double)i / (double)(nSteps));
-
-            break;
-        }
-        default:
-        {
-            throw std::runtime_error("illegal init type");
-            break;
-        }
-    }
-
     return ct::optcon::NLOptConSolver<state_dim, control_dim>::Policy_t(x0, u0, u0_fb, dt);
-}
-
-
-//! loop through all cost function terms in NLOC and update their desired final states
-void updateCostFunctionFinalStates(const StateVector& x_f,
-    ct::optcon::NLOptConSolver<state_dim, control_dim>& nloc)
-{
-    // get vector of pointers to the cost functions
-    std::vector<std::shared_ptr<ct::optcon::CostFunctionQuadratic<state_dim, control_dim>>>& costInst =
-        nloc.getCostFunctionInstances();
-
-    // update the joint-level cost functions with sampled reference state
-    for (size_t i = 0; i < costInst.size(); i++)
-    {
-        costInst[i]->updateReferenceState(x_f);
-        costInst[i]->updateFinalState(x_f);
-    }
 }
 
 
@@ -142,31 +101,16 @@ int main(int argc, char* argv[])
         new ct::optcon::CostFunctionAnalytical<state_dim, control_dim>());
 
     ROS_INFO("Setting up task-space cost term");
-    using HyAKinematicsAD_t = HyA::tpl::Kinematics<ct::core::ADCGScalar>;
     using HyAKinematics_t = HyA::tpl::Kinematics<double>;
 
-
     // task space cost term
-    using TermTaskspacePoseCG = ct::rbd::TermTaskspacePoseCG<HyAKinematicsAD_t, false, state_dim, control_dim>;
-    std::shared_ptr<TermTaskspacePoseCG> termTaskSpace_final(
-        new TermTaskspacePoseCG(costFunctionFile, "termTaskSpace_final", true));
+    using TermTaskspacePose = ct::rbd::TermTaskspaceGeometricJacobian<HyAKinematics_t, state_dim, control_dim>;
+    std::shared_ptr<TermTaskspacePose> termTaskSpace_final(
+        new TermTaskspacePose(costFunctionFile, "termTaskSpace_final", true));
     size_t task_space_term_id = costFun->addFinalTerm(termTaskSpace_final, true);
 
     ROS_INFO("Solving Inverse Kinematics for Initial Guess");
     ct::rbd::RigidBodyPose ee_pose_des = termTaskSpace_final->getReferencePose();
-    // try to compute an IK solution
-    ct::rbd::HyAInverseKinematics<double> hya_ik_solver;
-    StateVector xf;  // temporary final state
-    xf.setZero();
-
-// temporarily deactivated
-//    ct::rbd::JointState<6>::Position ikSolution;
-//    if (!hya_ik_solver.computeInverseKinematicsCloseTo(ikSolution, ee_pose_des, x0))
-//    {
-//        ROS_INFO("Could not find IK solution for this target pose. Exiting.");
-//        return 0;
-//    }
-//    xf = ikSolution;
 
     ROS_INFO("Setting up joint-space cost terms");
     using TermQuadratic = ct::optcon::TermQuadratic<state_dim, control_dim>;
@@ -178,63 +122,15 @@ int main(int argc, char* argv[])
     costFun->initialize();
 
 
-    /* STEP 1-D: set up the box constraints */
-    // constraint terms
-    ROS_INFO("Setting up joint-space box constraints");
-
-    // create constraint container
-    std::shared_ptr<ct::optcon::ConstraintContainerAnalytical<state_dim, control_dim>> inputBoxConstraints(
-        new ct::optcon::ConstraintContainerAnalytical<state_dim, control_dim>());
-
-    std::shared_ptr<ct::optcon::ConstraintContainerAnalytical<state_dim, control_dim>> stateBoxConstraints(
-        new ct::optcon::ConstraintContainerAnalytical<state_dim, control_dim>());
-
-    // input constraint bounds
-    ct::core::ControlVector<control_dim> u_lb = -100 * ct::core::ControlVector<control_dim>::Ones();
-    ct::core::ControlVector<control_dim> u_ub = 100 * ct::core::ControlVector<control_dim>::Ones();
-    // input constraint terms
-    std::shared_ptr<ct::optcon::ControlInputConstraint<state_dim, control_dim>> controlConstraint(
-        new ct::optcon::ControlInputConstraint<state_dim, control_dim>(u_lb, u_ub));
-    controlConstraint->setName("ControlInputConstraint");
-        // add and initialize constraint terms
-    inputBoxConstraints->addIntermediateConstraint(controlConstraint, true);
-    inputBoxConstraints->initialize();
-    
-    // state constraint bounds
-    ct::core::StateVector<state_dim> x_lb, x_ub;
-    x_lb.head<njoints>() = -3.14 * Eigen::Matrix<double, njoints, 1>::Ones(); // lower bound on position
-    x_ub.head<njoints>() =  3.14 * Eigen::Matrix<double, njoints, 1>::Ones(); // upper bound on position
-    x_lb.tail<njoints>() = -100 * Eigen::Matrix<double, njoints, 1>::Ones(); // lower bound on velocity
-    x_ub.tail<njoints>() =  100 * Eigen::Matrix<double, njoints, 1>::Ones(); // upper bound on velocity
-    // state constraint terms
-    std::shared_ptr<ct::optcon::StateConstraint<state_dim, control_dim>> stateConstraint(
-        new ct::optcon::StateConstraint<state_dim, control_dim>(x_lb, x_ub));
-    stateConstraint->setName("StateConstraint");
-    // add and initialize constraint terms    
-    stateBoxConstraints->addIntermediateConstraint(stateConstraint, true);
-    stateBoxConstraints->addTerminalConstraint(stateConstraint,true);
-    stateBoxConstraints->initialize();
-
-
     ROS_INFO("Creating optcon problem now");
     ct::optcon::ContinuousOptConProblem<state_dim, control_dim> optConProblem(tf, x0, system, costFun, linSystem);
-    // add the box constraints to the optimal control problem
-    optConProblem.setInputBoxConstraints(inputBoxConstraints);
-    optConProblem.setStateBoxConstraints(stateBoxConstraints);
-
 
     ROS_INFO("Creating solver now");
     NLOptConSolver nloc(optConProblem, nloc_settings);
     nloc.configure(nloc_settings);
 
-
-    int initType = 0;
-    ct::core::loadScalar(configFile, "initType", initType);
-    NLOptConSolver::Policy_t initController = computeInitialGuess(initType, nSteps, x0, xf, nloc_settings.dt);
+    NLOptConSolver::Policy_t initController = computeInitialGuess(nSteps, x0, nloc_settings.dt);
     nloc.setInitialGuess(initController);
-
-    updateCostFunctionFinalStates(xf, nloc);
-
 
     ROS_INFO("Solving problem ...");
 
@@ -244,7 +140,7 @@ int main(int argc, char* argv[])
 
     do
     {
-      std::cout << '\n' << "Press a key to continue...";
+        std::cout << '\n' << "Press a key to continue...";
     } while (std::cin.get() != '\n');
 
     while (ros::ok())
@@ -268,7 +164,6 @@ int main(int argc, char* argv[])
             RBDState<njoints> state;
             state.setZero();
             state.jointPositions() = x_solution[i].template cast<double>().head<6>();
-//            state.jointVelocities() = x_solution[i].template cast<double>().tail<6>();
 
             statePublisher.publishState(state);
             publishRate.sleep();

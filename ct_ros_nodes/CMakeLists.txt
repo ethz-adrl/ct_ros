@@ -79,34 +79,23 @@ if(BUILD_HYQ_FULL)
     target_link_libraries(HyQNLOCContactModel ${catkin_LIBRARIES} ct_models)
     add_dependencies(HyQNLOCContactModel ${PROJECT_NAME}_gencfg)
 endif(BUILD_HYQ_FULL)
-    
-#add_executable(HyQSimulator examples/HyQ/HyQSimulator.cpp)
-#target_link_libraries(HyQSimulator ${catkin_LIBRARIES})
-#add_dependencies(HyQSimulator ${PROJECT_NAME}_gencfg)
-
-#add_executable(HyQVisualization examples/HyQ/HyQVisualization.cpp)
-#target_link_libraries(HyQVisualization ${catkin_LIBRARIES} )
-    
+   
 add_executable(HyANLOC examples/HyA/HyANLOC.cpp)
 target_link_libraries(HyANLOC ${catkin_LIBRARIES} ct_models)
 
 add_executable(HyANLOC_TaskSpace examples/HyA/HyANLOC_TaskSpace.cpp)
 target_link_libraries(HyANLOC_TaskSpace ${catkin_LIBRARIES} ct_ros_visualization ct_models)
 
-add_executable(HyANLOC_TaskSpaceVel examples/HyA/HyANLOC_TaskSpaceVel.cpp)
-target_link_libraries(HyANLOC_TaskSpaceVel ${catkin_LIBRARIES} ct_ros_visualization ct_models)
-    
 add_executable(HyANLOC_TaskSpaceAcc examples/HyA/HyANLOC_TaskSpaceAcc.cpp)
 target_link_libraries(HyANLOC_TaskSpaceAcc ${catkin_LIBRARIES} ct_ros_visualization ct_models)
 
-add_executable(HyANLOC_ObstacleAcc examples/HyA/HyANLOC_ObstacleAcc.cpp)
-target_link_libraries(HyANLOC_ObstacleAcc ${catkin_LIBRARIES} ct_ros_visualization ct_models)
-    
+if(CPPADCG)
+  add_executable(HyANLOC_ObstacleAcc examples/HyA/HyANLOC_ObstacleAcc.cpp)
+  target_link_libraries(HyANLOC_ObstacleAcc ${catkin_LIBRARIES} ct_ros_visualization ct_models)
+endif()
+
 add_executable(HyA_NLP_IK examples/HyA/HyA_NLP_IK.cpp) 
 target_link_libraries(HyA_NLP_IK ${catkin_LIBRARIES} ct_ros_visualization ct_models)
-
-#add_executable(HyAMobileNLOC examples/HyAMobile/kinematic/HyAMobileNLOC.cpp)
-#target_link_libraries(HyAMobileNLOC ${catkin_LIBRARIES} ct_ros_visualization)
 
 add_executable(ex_NLOC_MPC_invertedPendulum examples/mpc/InvertedPendulum/InvertedPendulumMPC.cpp)
 target_link_libraries(ex_NLOC_MPC_invertedPendulum ${catkin_LIBRARIES} ct_models)
