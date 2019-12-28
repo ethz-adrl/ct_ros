@@ -3,18 +3,20 @@
 ![GitHub top language](https://img.shields.io/github/languages/top/ethz-adrl/ct_ros.svg?style=social)
 ![GitHub](https://img.shields.io/github/license/ethz-adrl/ct_ros.svg?style=social)
 
-This repository contains robotics examples for the [control toolbox](https://ethz-adrl.github.io/ct/). If you have not installed the control toolbox yet, please go [here](https://ethz-adrl.github.io/ct/) for the source-code.
-Link to the [documentation](https://ethz-adrl.github.io/ct/) of the control toolbox. If you are familiar with the basic concepts of
-the CTs optimal control solvers and robot models, you can find more complex and demanding application examples in this repository.
+This repository contains *robotics examples* for the [control toolbox](https://ethz-adrl.github.io/ct/). Examples include
+ * nonlinear optimal control of a robot arm using iLQR and GNMS
+ * nonlinear optimal control of a legged robot using iLQR
+ * nonlinear optimal control of a quadrotor with a double pendulum attached
 
-## Earlier Versions
+The main purpose of this repository is to provide minimal working examples of how to use the CT with robotic systems modelled using RobCoGen. If you are familiar with the basic concepts of the CTs optimal control solvers and robot models, you can find more complex and demanding application examples in this repository.
 
-Earlier versions up to control toolbox release v2.3 are hosted on bitbucket, they can be found at https://bitbucket.org/adrlab/ct_ros
-It is, however, recommended to ignore those legacy versions from bitbucket and work with this maintained release.
+If you have not installed the control toolbox yet, please go [here](https://ethz-adrl.github.io/ct/) for the source-code.
+Link to the [documentation](https://ethz-adrl.github.io/ct/) of the control toolbox. 
 
 ## Requirements
- * tested under Ubuntu 16.04 and 18.04
- * requires ROS Kinetic or later
+ * Ubuntu 16.04 or 18.04
+ * ROS Kinetic or later
+ * installation of the [control toolbox](https://ethz-adrl.github.io/ct/)
 
 ## Maintenance
 Markus Giftthaler, markusgft (at) gmail (dot) com
@@ -48,3 +50,10 @@ Please see LICENCE.txt and NOTICE.txt
       number    ={}, 
       volume    ={}, 
     }
+    
+
+## Earlier Versions
+
+Earlier versions up to control toolbox release v2.3 are hosted on bitbucket, they can be found at https://bitbucket.org/adrlab/ct_ros
+It is, however, recommended to ignore those legacy versions from bitbucket and work with this maintained release.
+
